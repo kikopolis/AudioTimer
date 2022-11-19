@@ -16,13 +16,13 @@ import static com.kikopolis.util.SystemInfo.isWindows;
 
 public class Config {
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
+    private final String dataDir;
     private int width;
     private int height;
     private Image icon;
     private String iconPath;
     private String appName;
     private String appVersion;
-    private String dataDir;
     
     public Config(final String appDataDir) {
         dataDir = appDataDir;

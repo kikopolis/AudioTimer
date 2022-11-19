@@ -19,6 +19,7 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void init() {
+        config.setDefaultsByOperatingSystem();
         configureLayout();
         configureWindow();
         addConfigShutDownHook();
