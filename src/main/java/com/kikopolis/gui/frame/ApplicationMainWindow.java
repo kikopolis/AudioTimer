@@ -2,11 +2,14 @@ package com.kikopolis.gui.frame;
 
 import com.kikopolis.config.Config;
 import com.kikopolis.config.ConfigManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ApplicationMainWindow extends JFrame {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainWindow.class.getName());
     private static final ConfigManager configManager = new ConfigManager();
     private static final Config config = configManager.getConfig();
     private static final GridBagLayout layout = new GridBagLayout();
@@ -39,6 +42,6 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void addConfigShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
+        Runtime.getRuntime().addShutdownHook(new Thread(configManager::save));
     }
 }
