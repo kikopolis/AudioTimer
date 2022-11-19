@@ -94,7 +94,7 @@ public class Config {
         } else if (isWindows()) {
             setWindowsConfig();
         } else if (isLinux()) {
-            setWindowsConfig();
+            setLinuxConfig();
         }
     }
     
