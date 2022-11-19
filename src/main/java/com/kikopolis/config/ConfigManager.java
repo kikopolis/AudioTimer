@@ -25,12 +25,12 @@ public class ConfigManager {
     private final File configFile;
     
     public ConfigManager() {
-        configFilePath = getConfigFilePath();
+        configFilePath = Defaults.APP_DATA_DIR + File.separator + ".config";
         configFile = new File(configFilePath);
-        config = new Config();
-        if (!configFile.exists() && !createConfigFile() && !configFile.canRead()) {
+        if (!createConfigFile()) {
             throw new ConfigFileDoesNotExistException(configFilePath);
         }
+        config = new Config(Defaults.APP_DATA_DIR);
         readFromFile();
     }
     
@@ -44,7 +44,7 @@ public class ConfigManager {
             writer.newLine();
             writer.write(HEIGHT_PARAM_NAME + config.getHeight());
             writer.newLine();
-            writer.write(ICON_PARAM_NAME + config.getIcon());
+            writer.write(ICON_PARAM_NAME + config.getIconPath());
             writer.newLine();
             writer.write(APP_NAME_PARAM_NAME + config.getAppName());
             writer.newLine();
@@ -77,23 +77,16 @@ public class ConfigManager {
     }
     
     private boolean createConfigFile() {
-        File file = new File(configFilePath);
         try {
-            if (!configFile.getParentFile().exists() && !configFile.getParentFile().mkdirs()) {
-                return false;
+            File dir = new File(Defaults.APP_DATA_DIR);
+            if (!dir.exists()) {
+                dir.mkdirs();
             }
+            File file = new File(configFilePath);
             return file.createNewFile();
         } catch (IOException e) {
             LOGGER.error("Could not create configuration file", e);
         }
         return false;
-    }
-    
-    private static String getUserDataDirectory() {
-        return System.getProperty("user.home") + File.separator + ".kikopolis" + File.separator + "data";
-    }
-    
-    private static String getConfigFilePath() {
-        return getUserDataDirectory() + File.separator + "config";
     }
 }
