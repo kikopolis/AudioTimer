@@ -7,14 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ApplicationMainWindow extends JFrame {
-    private final ConfigManager configManager;
-    private final Config config;
-    private GridBagLayout layout;
-    private GridBagConstraints gbc;
+    private static final ConfigManager configManager = new ConfigManager();
+    private static final Config config = configManager.getConfig();
+    private static final GridBagLayout layout = new GridBagLayout();
+    private static final GridBagConstraints gbc = new GridBagConstraints();
     
     public ApplicationMainWindow() {
-        configManager = new ConfigManager();
-        config = configManager.readFromDisk();
         init();
         // TODO: add components
         setVisible(true);
@@ -27,8 +25,6 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void configureLayout() {
-        layout = new GridBagLayout();
-        gbc = new GridBagConstraints();
         setLayout(layout);
     }
     
@@ -42,6 +38,6 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void addConfigShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::writeToDisk));
+        Runtime.getRuntime().addShutdownHook(new Thread(configManager::saveConfig));
     }
 }
