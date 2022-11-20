@@ -1,4 +1,4 @@
-package com.kikopolis.event;
+package com.kikopolis.util;
 
 import java.time.LocalDate;
 

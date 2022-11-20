@@ -1,7 +1,7 @@
-package com.kikopolis.event;
+package com.kikopolis.episode;
 
 import com.google.inject.Inject;
-import com.kikopolis.config.EventWriterAndReader;
+import com.kikopolis.util.DayOfWeek;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,66 +11,64 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 
-public class EventManagerWithScheduler implements EventManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventManagerWithScheduler.class.getName());
-    private final EventWriterAndReader eventWriterAndReader;
-    private final EventDispatcher dispatcher;
-    private final List<Event> events;
+public class EpisodeManagerWithScheduler implements EpisodeManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpisodeManagerWithScheduler.class.getName());
+    private final EpisodeWriterAndReader episodeWriterAndReader;
+    private final List<AudioEpisode> episodes;
     private final StampedLock lock;
     
     @Inject
-    public EventManagerWithScheduler(final EventWriterAndReader eventWriterAndReader, final EventDispatcher eventDispatcher) {
-        this.eventWriterAndReader = eventWriterAndReader;
-        dispatcher = eventDispatcher;
-        events = new ArrayList<>();
+    public EpisodeManagerWithScheduler(final EpisodeWriterAndReader episodeWriterAndReader) {
+        this.episodeWriterAndReader = episodeWriterAndReader;
+        episodes = new ArrayList<>();
         lock = new StampedLock();
     }
     
     public void save() {
         long stamp = lock.writeLock();
         try {
-            purgeEvents();
-            eventWriterAndReader.write(events);
+            purgeEpisodes();
+            episodeWriterAndReader.write(episodes);
         } finally {
             lock.unlockWrite(stamp);
         }
     }
     
     @Override
-    public void addEvent(Event event) {
+    public void addEpisode(AudioEpisode episode) {
         long stamp = lock.writeLock();
         try {
-            events.add(event);
-            LOGGER.debug("Added event: {}", event);
-            purgeEvents();
+            episodes.add(episode);
+            LOGGER.debug("Added episode: {}", episode);
+            purgeEpisodes();
         } finally {
             lock.unlockWrite(stamp);
         }
     }
     
     @Override
-    public void removeEvent(Event event) {
+    public void removeEpisode(AudioEpisode episode) {
         long stamp = lock.writeLock();
         try {
-            events.remove(event);
-            LOGGER.debug("Removed event: {}", event);
+            episodes.remove(episode);
+            LOGGER.debug("Removed episode: {}", episode);
         } finally {
             lock.unlockWrite(stamp);
         }
     }
     
     @Override
-    public void checkAndDispatchEvents() {
+    public void checkAndDispatchEpisodes() {
         long stamp = lock.writeLock();
         try {
-            if (events.isEmpty()) {
-                setEvents(eventWriterAndReader.read());
+            if (episodes.isEmpty()) {
+                setEpisodes(episodeWriterAndReader.read());
             }
-            purgeEvents();
+            purgeEpisodes();
             setRunTimes();
-            for (Event event : events) {
-                if (event.isReadyForDispatch()) {
-                    dispatcher.dispatch(event);
+            for (AudioEpisode episode : episodes) {
+                if (episode.isReadyForDispatch()) {
+                    // TODO : dispatch episode
                 }
             }
             clearRunTimes();
@@ -80,24 +78,24 @@ public class EventManagerWithScheduler implements EventManager {
     }
     
     @Override
-    public List<Event> getEvents() {
+    public List<AudioEpisode> getEpisodes() {
         long stamp = lock.readLock();
         try {
-            return events;
+            return episodes;
         } finally {
             lock.unlockRead(stamp);
         }
     }
     
     @Override
-    public void setEvents(List<Event> events) {
+    public void setEpisodes(List<AudioEpisode> episodes) {
         long stamp = lock.writeLock();
         try {
-            this.events.clear();
-            if (events != null) {
-                this.events.addAll(events);
+            this.episodes.clear();
+            if (episodes != null) {
+                this.episodes.addAll(episodes);
             }
-            purgeEvents();
+            purgeEpisodes();
         } finally {
             lock.unlockWrite(stamp);
         }
@@ -119,8 +117,8 @@ public class EventManagerWithScheduler implements EventManager {
         LOGGER.debug("Cleared current run times.");
     }
     
-    private void purgeEvents() {
-        events.removeIf(event -> event.isValid() && !event.isDispatched());
+    private void purgeEpisodes() {
+        episodes.removeIf(episode -> episode.isValid() && !episode.isDispatched());
     }
     
     public static final class CurrentTimeHolder {

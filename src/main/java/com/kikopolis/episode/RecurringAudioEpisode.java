@@ -1,22 +1,23 @@
-package com.kikopolis.event;
+package com.kikopolis.episode;
 
-import com.kikopolis.event.EventManagerWithScheduler.CurrentTimeHolder;
+import com.kikopolis.episode.EpisodeManagerWithScheduler.CurrentTimeHolder;
+import com.kikopolis.util.DayOfWeek;
 
 import java.util.List;
 import java.util.Objects;
 
-public final class RepeatableEvent extends Event {
+public final class RecurringAudioEpisode extends AudioEpisode {
     private DayOfWeek dayOfWeek;
     private DayOfWeek dispatchedOnLatest;
     
-    public RepeatableEvent(
+    public RecurringAudioEpisode(
             final String name,
             final String sound,
             final Integer hour,
             final Integer minute,
             final DayOfWeek dayOfWeek,
             final DayOfWeek dispatchedOnLatest
-                          ) {
+                                ) {
         super(name, sound, hour, minute, false);
         this.dayOfWeek = dayOfWeek != null ? dayOfWeek : DayOfWeek.EMPTY_DAY_OF_WEEK;
         this.dispatchedOnLatest = dispatchedOnLatest != null ? dispatchedOnLatest : DayOfWeek.EMPTY_DAY_OF_WEEK;
@@ -54,7 +55,7 @@ public final class RepeatableEvent extends Event {
     @Override
     public Iterable<String> toCsv() {
         return List.of(
-                "RepeatableEvent",
+                "RepeatableEpisode",
                 getName() != null ? getName() : EMPTY_NAME,
                 getSound() != null ? getSound() : EMPTY_SOUND,
                 getHour() != null ? getHour().toString() : EMPTY_HOUR.toString(),

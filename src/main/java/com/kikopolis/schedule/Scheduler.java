@@ -1,4 +1,4 @@
-package com.kikopolis.event;
+package com.kikopolis.schedule;
 
 public interface Scheduler {
     boolean isRunning();

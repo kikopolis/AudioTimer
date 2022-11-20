@@ -5,27 +5,24 @@ import com.kikopolis.config.AppConfig;
 import com.kikopolis.config.ConfigWriterAndReader;
 import com.kikopolis.config.ConfigWriterAndReaderKeyValue;
 import com.kikopolis.config.Configuration;
-import com.kikopolis.config.EventWriterAndReader;
-import com.kikopolis.config.EventWriterAndReaderCsv;
-import com.kikopolis.event.EventDispatcher;
-import com.kikopolis.event.EventDispatcherWithScheduler;
-import com.kikopolis.event.EventManager;
-import com.kikopolis.event.EventManagerWithScheduler;
-import com.kikopolis.event.Scheduler;
-import com.kikopolis.event.SchedulerByInterval;
+import com.kikopolis.episode.EpisodeWriterAndReader;
+import com.kikopolis.episode.EpisodeWriterAndReaderCsv;
+import com.kikopolis.episode.EpisodeManager;
+import com.kikopolis.episode.EpisodeManagerWithScheduler;
+import com.kikopolis.schedule.Scheduler;
+import com.kikopolis.schedule.SchedulerByInterval;
 
 public class AppModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ConfigWriterAndReader.class).to(ConfigWriterAndReaderKeyValue.class);
-        bind(EventWriterAndReader.class).to(EventWriterAndReaderCsv.class);
+        bind(EpisodeWriterAndReader.class).to(EpisodeWriterAndReaderCsv.class);
         
         bind(Configuration.class).to(AppConfig.class);
         
-        bind(EventDispatcher.class).to(EventDispatcherWithScheduler.class);
-        // EventManager needs EventDispatcher
-        bind(EventManager.class).to(EventManagerWithScheduler.class);
-        // Scheduler needs EventManager
+        // EpisodeManager needs EpisodeDispatcher
+        bind(EpisodeManager.class).to(EpisodeManagerWithScheduler.class);
+        // Scheduler needs EpisodeManager
         bind(Scheduler.class).to(SchedulerByInterval.class);
     }
 }

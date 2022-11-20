@@ -2,8 +2,8 @@ package com.kikopolis.gui.frame;
 
 import com.kikopolis.config.ConfigParam;
 import com.kikopolis.config.Configuration;
-import com.kikopolis.event.EventManager;
-import com.kikopolis.gui.panel.EventList;
+import com.kikopolis.episode.EpisodeManager;
+import com.kikopolis.gui.panel.EpisodeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,17 +15,17 @@ public class ApplicationMainWindow extends JFrame {
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
     private final transient Configuration config;
-    private EventManager eventManager;
+    private EpisodeManager episodeManager;
     
-    public ApplicationMainWindow(final Configuration config, final EventManager eventManager) {
+    public ApplicationMainWindow(final Configuration config, final EpisodeManager episodeManager) {
         this.config = config;
-        this.eventManager = eventManager;
+        this.episodeManager = episodeManager;
         init();
         
-        EventList eventList = new EventList();
-        add(eventList, gbc);
-        eventList.display(eventManager.getEvents());
-        eventList.setVisible(true);
+        EpisodeList episodeList = new EpisodeList();
+        add(episodeList, gbc);
+        episodeList.display(episodeManager.getEpisodes());
+        episodeList.setVisible(true);
         
         setVisible(true);
     }

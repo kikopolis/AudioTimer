@@ -1,10 +1,12 @@
-package com.kikopolis.event;
+package com.kikopolis.episode;
+
+import com.kikopolis.util.DayOfWeek;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public abstract sealed class Event implements Serializable permits RepeatableEvent, SingularEvent {
+public abstract sealed class AudioEpisode implements Serializable permits RecurringAudioEpisode, SingularAudioEpisode {
     public static final String EMPTY_NAME = "empty_name";
     public static final String EMPTY_SOUND = "empty_sound";
     public static final Integer EMPTY_HOUR = -12;
@@ -15,7 +17,7 @@ public abstract sealed class Event implements Serializable permits RepeatableEve
     private Integer minute;
     private boolean isDispatched;
     
-    protected Event(final String name, final String sound, final Integer hour, final Integer minute, final boolean isDispatched) {
+    protected AudioEpisode(final String name, final String sound, final Integer hour, final Integer minute, final boolean isDispatched) {
         this.name = name != null ? name : EMPTY_NAME;
         this.sound = sound != null ? sound : EMPTY_SOUND;
         this.hour = hour != null ? hour : EMPTY_HOUR;
@@ -23,9 +25,9 @@ public abstract sealed class Event implements Serializable permits RepeatableEve
         this.isDispatched = isDispatched;
     }
     
-    public static Event createFromCsv(final String[] csv) {
+    public static AudioEpisode createFromCsv(final String[] csv) {
         return switch (csv[0]) {
-            case "RepeatableEvent" -> new RepeatableEvent(
+            case "RepeatableEpisode" -> new RecurringAudioEpisode(
                     csv[1],
                     csv[2],
                     Integer.parseInt(csv[3]),
@@ -33,7 +35,7 @@ public abstract sealed class Event implements Serializable permits RepeatableEve
                     DayOfWeek.valueOf(csv[5]),
                     DayOfWeek.valueOf(csv[6])
             );
-            case "SingularEvent" -> new SingularEvent(
+            case "SingularEpisode" -> new SingularAudioEpisode(
                     csv[1],
                     csv[2],
                     Integer.parseInt(csv[3]),
@@ -41,7 +43,7 @@ public abstract sealed class Event implements Serializable permits RepeatableEve
                     Boolean.parseBoolean(csv[5]),
                     LocalDate.parse(csv[6])
             );
-            default -> throw new IllegalArgumentException("Unknown event type: " + csv[0]);
+            default -> throw new IllegalArgumentException("Unknown Episode type: " + csv[0]);
         };
     }
     
