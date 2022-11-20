@@ -1,7 +1,6 @@
 package com.kikopolis.config;
 
 import com.google.inject.Inject;
-import com.kikopolis.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +9,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kikopolis.util.DirectoryUtil.*;
 import static com.kikopolis.util.DirectoryUtil.DATA_DIR;
 import static com.kikopolis.util.SystemInfo.isLinux;
 import static com.kikopolis.util.SystemInfo.isMacOs;
@@ -82,7 +83,7 @@ public class AppConfig implements Configuration {
         // Check if the icon file exists in the app data directory and copy if it doesn't
         File dataDirIconFile = new File(DATA_DIR + File.separator + iconFile.getName());
         if (!dataDirIconFile.exists()) {
-            FileUtil.copyImageToDirectory(iconFile.getPath(), DATA_DIR);
+            copyImageToDirectory(iconFile.getPath());
         }
         try {
             icon = ImageIO.read(dataDirIconFile);
@@ -91,6 +92,18 @@ public class AppConfig implements Configuration {
             LOGGER.error("Unable to read icon from path: {}", path);
         }
         return icon;
+    }
+    
+    private void copyImageToDirectory(final String imagePath) {
+        File image = new File(imagePath);
+        File directory = new File(DATA_DIR);
+        if (image.exists() && directory.exists()) {
+            try {
+                Files.copy(image.toPath(), new File(DATA_DIR + File.separator + image.getName()).toPath());
+            } catch (IOException e) {
+                LOGGER.warn("Could not copy image to directory: {}", DATA_DIR);
+            }
+        }
     }
     
     public void setDefaultsByOperatingSystem() {
