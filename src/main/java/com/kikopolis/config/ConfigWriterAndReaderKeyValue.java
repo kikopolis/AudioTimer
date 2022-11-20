@@ -47,12 +47,9 @@ public class ConfigWriterAndReaderKeyValue implements ConfigWriterAndReader {
         try (BufferedReader br = new BufferedReader(new FileReader(configFilePath))) {
             String line = br.readLine();
             while (line != null) {
-                if (line.startsWith(ConfigParam.WIDTH.getKey())) {
-                    configMap.put(ConfigParam.WIDTH.getKey(), line.split("=")[1]);
-                } else if (line.startsWith(ConfigParam.HEIGHT.getKey())) {
-                    configMap.put(ConfigParam.HEIGHT.getKey(), line.split("=")[1]);
-                } else if (line.startsWith(ConfigParam.ICON_PATH.getKey())) {
-                    configMap.put(ConfigParam.ICON_PATH.getKey(), line.split("=")[1]);
+                if (line.contains("=")) {
+                    String[] split = line.split("=");
+                    configMap.put(split[0], split[1]);
                 }
                 line = br.readLine();
             }

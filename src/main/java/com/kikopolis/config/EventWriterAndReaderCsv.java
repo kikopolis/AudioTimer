@@ -30,9 +30,7 @@ public final class EventWriterAndReaderCsv implements EventWriterAndReader {
     public void write(final List<Event> events) {
         try (CSVPrinter csvPrinter = new CSVPrinter(new FileWriter(eventFile), CSVFormat.DEFAULT)) {
             for (Event event : events) {
-                if (event.isValid() && !event.isDispatched()) {
-                    csvPrinter.printRecord(event.toCsv());
-                }
+                csvPrinter.printRecord(event.toCsv());
             }
         } catch (IOException e) {
             LOGGER.error("Error writing events to file", e);
@@ -45,9 +43,7 @@ public final class EventWriterAndReaderCsv implements EventWriterAndReader {
         try (CSVParser csvParser = CSVParser.parse(new FileReader(eventFile), CSVFormat.DEFAULT)) {
             for (CSVRecord line : csvParser) {
                 Event event = createEventFromCsvRecord(line);
-                if (event != null && event.isValid() && !event.isDispatched()) {
-                    events.add(event);
-                }
+                events.add(event);
             }
         } catch (IOException e) {
             LOGGER.error("Unable to read event data from disk, events list has been reset to empty", e);

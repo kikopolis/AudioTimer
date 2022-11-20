@@ -9,80 +9,97 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.StampedLock;
 
 public class EventManagerWithScheduler implements EventManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventManagerWithScheduler.class.getName());
     private final EventWriterAndReader eventWriterAndReader;
     private final EventDispatcher dispatcher;
     private final List<Event> events;
+    private final StampedLock lock;
     
     @Inject
     public EventManagerWithScheduler(final EventWriterAndReader eventWriterAndReader, final EventDispatcher eventDispatcher) {
         this.eventWriterAndReader = eventWriterAndReader;
         dispatcher = eventDispatcher;
         events = new ArrayList<>();
-        // TODO: implement locks
+        lock = new StampedLock();
     }
     
     public void save() {
-        // TODO: check singular events that have run, and remove them
-//        eventWriterAndReader.write(events);
-        List<Event> ets = new ArrayList<>();
-        RepeatableEvent evt1 = new RepeatableEvent("test1", "test1.wav", 12, 12, DayOfWeek.MONDAY, DayOfWeek.THURSDAY);
-        SingularEvent evt2 = new SingularEvent("test2", "test1.wav", 12, 12, false, LocalDate.now());
-        RepeatableEvent evt3 = new RepeatableEvent("test3", "test1.wav", 12, 12, DayOfWeek.MONDAY, DayOfWeek.FRIDAY);
-        SingularEvent evt4 = new SingularEvent("test4", "test1.wav", 14, 55, true, LocalDate.now());
-        SingularEvent invalid1 = new SingularEvent(Event.EMPTY_NAME, Event.EMPTY_SOUND, Event.EMPTY_HOUR, Event.EMPTY_MINUTE, false, SingularEvent.EMPTY_DATE);
-        RepeatableEvent
-                invalid2 =
-                new RepeatableEvent(
-                        Event.EMPTY_NAME,
-                        Event.EMPTY_SOUND,
-                        Event.EMPTY_HOUR,
-                        Event.EMPTY_MINUTE,
-                        DayOfWeek.EMPTY_DAY_OF_WEEK,
-                        DayOfWeek.EMPTY_DAY_OF_WEEK
-                );
-        ets.add(evt1);
-        ets.add(evt2);
-        ets.add(evt3);
-        ets.add(evt4);
-        ets.add(invalid1);
-        ets.add(invalid2);
-        eventWriterAndReader.write(ets);
+        long stamp = lock.writeLock();
+        try {
+            purgeEvents();
+            eventWriterAndReader.write(events);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
     
     @Override
     public void addEvent(Event event) {
-        events.add(event);
-        LOGGER.debug("Added event: {}", event);
+        long stamp = lock.writeLock();
+        try {
+            events.add(event);
+            LOGGER.debug("Added event: {}", event);
+            purgeEvents();
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
     
     @Override
     public void removeEvent(Event event) {
-        events.remove(event);
-        LOGGER.debug("Removed event: {}", event);
+        long stamp = lock.writeLock();
+        try {
+            events.remove(event);
+            LOGGER.debug("Removed event: {}", event);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
     
     @Override
     public void checkAndDispatchEvents() {
-        if (events.isEmpty()) {
-            setEvents(eventWriterAndReader.read());
-        }
-        setRunTimes();
-        for (Event event : events) {
-            if (event.isReadyForDispatch()) {
-                dispatcher.dispatch(event);
+        long stamp = lock.writeLock();
+        try {
+            if (events.isEmpty()) {
+                setEvents(eventWriterAndReader.read());
             }
+            purgeEvents();
+            setRunTimes();
+            for (Event event : events) {
+                if (event.isReadyForDispatch()) {
+                    dispatcher.dispatch(event);
+                }
+            }
+            clearRunTimes();
+        } finally {
+            lock.unlockWrite(stamp);
         }
-        clearRunTimes();
+    }
+    
+    @Override
+    public List<Event> getEvents() {
+        long stamp = lock.readLock();
+        try {
+            return events;
+        } finally {
+            lock.unlockRead(stamp);
+        }
     }
     
     @Override
     public void setEvents(List<Event> events) {
-        this.events.clear();
-        if (events != null) {
-            this.events.addAll(events);
+        long stamp = lock.writeLock();
+        try {
+            this.events.clear();
+            if (events != null) {
+                this.events.addAll(events);
+            }
+            purgeEvents();
+        } finally {
+            lock.unlockWrite(stamp);
         }
     }
     
@@ -102,12 +119,12 @@ public class EventManagerWithScheduler implements EventManager {
         LOGGER.debug("Cleared current run times.");
     }
     
-    @Override
-    public List<Event> getEvents() {
-        return events;
+    private void purgeEvents() {
+        events.removeIf(event -> event.isValid() && !event.isDispatched());
     }
     
     public static final class CurrentTimeHolder {
+        
         private static LocalDate date;
         private static DayOfWeek dayOfWeek;
         private static Integer hour;
