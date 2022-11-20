@@ -28,7 +28,7 @@ public class App {
         
         scheduler.start();
         
-        new ApplicationMainWindow(config);
+        new ApplicationMainWindow(config, eventManager);
         
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             config.save();
