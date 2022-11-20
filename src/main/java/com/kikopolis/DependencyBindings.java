@@ -12,17 +12,13 @@ import com.kikopolis.episode.EpisodeManagerWithScheduler;
 import com.kikopolis.schedule.Scheduler;
 import com.kikopolis.schedule.SchedulerByInterval;
 
-public class AppModule extends AbstractModule {
+public class DependencyBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(ConfigWriterAndReader.class).to(ConfigWriterAndReaderKeyValue.class);
         bind(EpisodeWriterAndReader.class).to(EpisodeWriterAndReaderCsv.class);
-        
         bind(Configuration.class).to(AppConfig.class);
-        
-        // EpisodeManager needs EpisodeDispatcher
         bind(EpisodeManager.class).to(EpisodeManagerWithScheduler.class);
-        // Scheduler needs EpisodeManager
         bind(Scheduler.class).to(SchedulerByInterval.class);
     }
 }

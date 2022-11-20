@@ -1,9 +1,14 @@
 package com.kikopolis.gui.frame;
 
+import com.kikopolis.Events;
 import com.kikopolis.config.ConfigParam;
 import com.kikopolis.config.Configuration;
 import com.kikopolis.episode.EpisodeManager;
+import com.kikopolis.event.TestEscapePressedEvent;
 import com.kikopolis.gui.panel.EpisodeList;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +23,8 @@ public class ApplicationMainWindow extends JFrame {
     private EpisodeManager episodeManager;
     
     public ApplicationMainWindow(final Configuration config, final EpisodeManager episodeManager) {
+        Events.subscribe(this);
+        
         this.config = config;
         this.episodeManager = episodeManager;
         init();
@@ -28,6 +35,11 @@ public class ApplicationMainWindow extends JFrame {
         episodeList.setVisible(true);
         
         setVisible(true);
+    }
+    
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvt(final TestEscapePressedEvent event) {
+        System.exit(0);
     }
     
     private void init() {

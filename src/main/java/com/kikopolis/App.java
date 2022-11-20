@@ -4,9 +4,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.Configuration;
 import com.kikopolis.episode.EpisodeManager;
-import com.kikopolis.schedule.Scheduler;
+import com.kikopolis.event.TestEscapePressedEvent;
 import com.kikopolis.gui.frame.ApplicationMainWindow;
+import com.kikopolis.schedule.Scheduler;
 import com.kikopolis.util.DirectoryUtil;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class App {
     // TODO: Make main window that would hold the episode list, and misc config
@@ -18,7 +22,7 @@ public class App {
         // First make sure our data directory exists
         DirectoryUtil.createDirectoryIfNotExists(DirectoryUtil.DATA_DIR);
         //Create Guice injector and configure dependencies in AppModule
-        Injector injector = Guice.createInjector(new AppModule());
+        Injector injector = Guice.createInjector(new DependencyBindings());
         
         Configuration config = injector.getInstance(Configuration.class);
         
@@ -34,5 +38,17 @@ public class App {
             config.save();
             episodeManager.save();
         }));
+        
+        addCloseListener();
+    }
+    
+    private static void addCloseListener() {
+        // close when escape is pressed
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+            if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                Events.post(new TestEscapePressedEvent("asd"));
+            }
+            return false;
+        });
     }
 }
