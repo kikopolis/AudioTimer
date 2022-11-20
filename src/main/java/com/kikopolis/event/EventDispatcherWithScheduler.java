@@ -10,5 +10,6 @@ public class EventDispatcherWithScheduler implements EventDispatcher {
     @Override
     public void dispatch(Event event) {
         // TODO: implement
+        // TODO: if repeatable event, set lastrunonday
     }
 }

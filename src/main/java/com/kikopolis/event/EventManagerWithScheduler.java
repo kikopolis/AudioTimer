@@ -5,7 +5,6 @@ import com.kikopolis.config.EventWriterAndReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +25,31 @@ public class EventManagerWithScheduler implements EventManager {
     }
     
     public void save() {
-        eventWriterAndReader.write(events);
+        // TODO: check singular events that have run, and remove them
+//        eventWriterAndReader.write(events);
+        List<Event> ets = new ArrayList<>();
+        RepeatableEvent evt1 = new RepeatableEvent("test1", "test1.wav", 12, 12, DayOfWeek.MONDAY, DayOfWeek.THURSDAY);
+        SingularEvent evt2 = new SingularEvent("test2", "test1.wav", 12, 12, false, LocalDate.now());
+        RepeatableEvent evt3 = new RepeatableEvent("test3", "test1.wav", 12, 12, DayOfWeek.MONDAY, DayOfWeek.FRIDAY);
+        SingularEvent evt4 = new SingularEvent("test4", "test1.wav", 14, 55, true, LocalDate.now());
+        SingularEvent invalid1 = new SingularEvent(Event.EMPTY_NAME, Event.EMPTY_SOUND, Event.EMPTY_HOUR, Event.EMPTY_MINUTE, false, SingularEvent.EMPTY_DATE);
+        RepeatableEvent
+                invalid2 =
+                new RepeatableEvent(
+                        Event.EMPTY_NAME,
+                        Event.EMPTY_SOUND,
+                        Event.EMPTY_HOUR,
+                        Event.EMPTY_MINUTE,
+                        DayOfWeek.EMPTY_DAY_OF_WEEK,
+                        DayOfWeek.EMPTY_DAY_OF_WEEK
+                );
+        ets.add(evt1);
+        ets.add(evt2);
+        ets.add(evt3);
+        ets.add(evt4);
+        ets.add(invalid1);
+        ets.add(invalid2);
+        eventWriterAndReader.write(ets);
     }
     
     @Override
@@ -43,6 +66,9 @@ public class EventManagerWithScheduler implements EventManager {
     
     @Override
     public void checkAndDispatchEvents() {
+        if (events.isEmpty()) {
+            setEvents(eventWriterAndReader.read());
+        }
         setRunTimes();
         for (Event event : events) {
             if (event.isReadyForDispatch()) {
@@ -62,7 +88,7 @@ public class EventManagerWithScheduler implements EventManager {
     
     private void setRunTimes() {
         CurrentTimeHolder.setDate(LocalDate.now());
-        CurrentTimeHolder.setDayOfWeek(LocalDate.now().getDayOfWeek());
+        CurrentTimeHolder.setDayOfWeek(DayOfWeek.fromLocalDate(CurrentTimeHolder.getDate()));
         CurrentTimeHolder.setHour(LocalDateTime.now().getHour());
         CurrentTimeHolder.setMinute(LocalDateTime.now().getMinute());
         LOGGER.debug("Set current run times.");

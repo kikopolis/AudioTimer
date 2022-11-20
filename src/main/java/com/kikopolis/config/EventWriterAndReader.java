@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface EventWriterAndReader {
     void write(final List<Event> event);
-    
     List<Event> read();
 }
