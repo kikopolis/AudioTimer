@@ -1,6 +1,7 @@
 package com.kikopolis.gui.frame;
 
-import com.kikopolis.config.Config;
+import com.kikopolis.config.ConfigParam;
+import com.kikopolis.config.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +12,9 @@ public class ApplicationMainWindow extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainWindow.class.getName());
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
-    private final transient Config config;
+    private final transient Configuration config;
     
-    public ApplicationMainWindow(final Config config) {
+    public ApplicationMainWindow(final Configuration config) {
         this.config = config;
         init();
         // TODO: add components
@@ -30,9 +31,9 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void configureWindow() {
-        setTitle(config.getAppName());
-        setSize(config.getWidth(), config.getHeight());
-        setIconImage(config.getIcon());
+        setTitle(config.get(ConfigParam.APP_NAME));
+        setSize(config.getInt(ConfigParam.WIDTH), config.getInt(ConfigParam.HEIGHT));
+        setIconImage(config.loadAppIcon());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);

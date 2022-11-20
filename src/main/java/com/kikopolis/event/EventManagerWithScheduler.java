@@ -1,22 +1,32 @@
 package com.kikopolis.event;
 
+import com.google.inject.Inject;
+import com.kikopolis.config.EventWriterAndReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventManagerWithScheduler implements EventManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventManagerWithScheduler.class.getName());
+    private final EventWriterAndReader eventWriterAndReader;
     private final EventDispatcher dispatcher;
     private final List<Event> events;
     
-    public EventManagerWithScheduler(final EventDispatcher eventDispatcher, final List<Event> events) {
+    @Inject
+    public EventManagerWithScheduler(final EventWriterAndReader eventWriterAndReader, final EventDispatcher eventDispatcher) {
+        this.eventWriterAndReader = eventWriterAndReader;
         dispatcher = eventDispatcher;
-        this.events = events;
+        events = new ArrayList<>();
         // TODO: implement locks
+    }
+    
+    public void save() {
+        eventWriterAndReader.write(events);
     }
     
     @Override

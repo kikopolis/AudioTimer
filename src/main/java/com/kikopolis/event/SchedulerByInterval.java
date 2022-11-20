@@ -1,5 +1,6 @@
 package com.kikopolis.event;
 
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ public class SchedulerByInterval implements Scheduler {
     private final Timer timer;
     private final EventManager eventManager;
     
+    @Inject
     public SchedulerByInterval(final EventManager eventManager) {
         timer = new Timer();
         this.eventManager = eventManager;

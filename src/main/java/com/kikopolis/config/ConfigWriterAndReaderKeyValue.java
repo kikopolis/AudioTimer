@@ -1,5 +1,7 @@
 package com.kikopolis.config;
 
+import com.google.inject.Inject;
+import com.kikopolis.util.DirectoryUtil;
 import com.kikopolis.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,22 +15,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.kikopolis.config.ConfigParams.APP_NAME;
-import static com.kikopolis.config.ConfigParams.APP_VERSION;
-import static com.kikopolis.config.ConfigParams.DATA_DIR;
-import static com.kikopolis.config.ConfigParams.HEIGHT;
-import static com.kikopolis.config.ConfigParams.ICON_PATH;
-import static com.kikopolis.config.ConfigParams.WIDTH;
-
 public class ConfigWriterAndReaderKeyValue implements ConfigWriterAndReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigWriterAndReaderKeyValue.class);
-    private final String appDataDir;
     private final String configFilePath;
     private final File configFile;
     
-    public ConfigWriterAndReaderKeyValue(final String appDataDir) {
-        this.appDataDir = appDataDir;
-        configFilePath = appDataDir + File.separator + ".config";
+    @Inject
+    public ConfigWriterAndReaderKeyValue() {
+        configFilePath = DirectoryUtil.DATA_DIR + File.separator + ".config";
         configFile = new File(configFilePath);
     }
     
@@ -53,24 +47,18 @@ public class ConfigWriterAndReaderKeyValue implements ConfigWriterAndReader {
         try (BufferedReader br = new BufferedReader(new FileReader(configFilePath))) {
             String line = br.readLine();
             while (line != null) {
-                if (line.startsWith(WIDTH)) {
-                    configMap.put(WIDTH, line.split("=")[1]);
-                } else if (line.startsWith(HEIGHT)) {
-                    configMap.put(HEIGHT, line.split("=")[1]);
-                } else if (line.startsWith(ICON_PATH)) {
-                    configMap.put(ICON_PATH, line.split("=")[1]);
-                } else if (line.startsWith(APP_NAME)) {
-                    configMap.put(APP_NAME, line.split("=")[1]);
-                } else if (line.startsWith(APP_VERSION)) {
-                    configMap.put(APP_VERSION, line.split("=")[1]);
+                if (line.startsWith(ConfigParam.WIDTH.getKey())) {
+                    configMap.put(ConfigParam.WIDTH.getKey(), line.split("=")[1]);
+                } else if (line.startsWith(ConfigParam.HEIGHT.getKey())) {
+                    configMap.put(ConfigParam.HEIGHT.getKey(), line.split("=")[1]);
+                } else if (line.startsWith(ConfigParam.ICON_PATH.getKey())) {
+                    configMap.put(ConfigParam.ICON_PATH.getKey(), line.split("=")[1]);
                 }
                 line = br.readLine();
             }
         } catch (IOException e) {
             LOGGER.error("%{}. Using DEFAULT configuration.", e.getMessage());
         }
-        // add app data directory to config
-        configMap.put(DATA_DIR, appDataDir);
         return configMap;
     }
 }

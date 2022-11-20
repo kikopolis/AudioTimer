@@ -1,10 +1,12 @@
 package com.kikopolis.config;
 
 import com.kikopolis.event.Event;
+import com.kikopolis.util.DirectoryUtil;
 import com.kikopolis.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,8 +22,9 @@ public final class EventWriterAndReaderCsv implements EventWriterAndReader {
     private final String eventFilePath;
     private final File eventFile;
     
-    public EventWriterAndReaderCsv(final String appDataDir) {
-        eventFilePath = appDataDir + File.separator + ".events";
+    @Inject
+    public EventWriterAndReaderCsv() {
+        eventFilePath = DirectoryUtil.DATA_DIR + File.separator + ".events";
         eventFile = new File(eventFilePath);
     }
     

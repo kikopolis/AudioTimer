@@ -8,4 +8,5 @@ public interface EventManager {
     void checkAndDispatchEvents();
     List<Event> getEvents();
     void setEvents(final List<Event> events);
+    void save();
 }
