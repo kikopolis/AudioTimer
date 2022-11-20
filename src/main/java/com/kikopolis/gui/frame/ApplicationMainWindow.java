@@ -1,7 +1,6 @@
 package com.kikopolis.gui.frame;
 
 import com.kikopolis.config.Config;
-import com.kikopolis.config.ConfigManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,22 +9,20 @@ import java.awt.*;
 
 public class ApplicationMainWindow extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainWindow.class.getName());
-    private static final ConfigManager configManager = new ConfigManager();
-    private static final Config config = configManager.getConfig();
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
+    private final transient Config config;
     
-    public ApplicationMainWindow() {
+    public ApplicationMainWindow(final Config config) {
+        this.config = config;
         init();
         // TODO: add components
         setVisible(true);
     }
     
     private void init() {
-        config.setDefaultsByOperatingSystem();
         configureLayout();
         configureWindow();
-        addConfigShutDownHook();
     }
     
     private void configureLayout() {
@@ -39,9 +36,5 @@ public class ApplicationMainWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
-    }
-    
-    private void addConfigShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(configManager::save));
     }
 }

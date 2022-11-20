@@ -1,5 +1,6 @@
 package com.kikopolis.config;
 
+import com.kikopolis.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,8 +9,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Map;
 
+import static com.kikopolis.config.ConfigParams.APP_NAME;
+import static com.kikopolis.config.ConfigParams.APP_VERSION;
+import static com.kikopolis.config.ConfigParams.HEIGHT;
+import static com.kikopolis.config.ConfigParams.ICON_PATH;
+import static com.kikopolis.config.ConfigParams.WIDTH;
 import static com.kikopolis.util.SystemInfo.isLinux;
 import static com.kikopolis.util.SystemInfo.isMacOs;
 import static com.kikopolis.util.SystemInfo.isWindows;
@@ -24,14 +30,19 @@ public class Config {
     private String appName;
     private String appVersion;
     
-    public Config(final String appDataDir) {
-        dataDir = appDataDir;
-        width = Defaults.DEFAULT_WIDTH;
-        height = Defaults.DEFAULT_HEIGHT;
-        iconPath = dataDir + File.separator + "icon.png";
-        appName = Defaults.DEFAULT_APP_NAME;
-        appVersion = Defaults.DEFAULT_APP_VERSION;
+    public Config(final Map<String, String> configData) {
+        // get values if present and if not set from defaults
+        this.dataDir = configData.getOrDefault(ConfigParams.DATA_DIR, Defaults.DATA_DIR);
+        this.width = Integer.parseInt(configData.getOrDefault(WIDTH, String.valueOf(Defaults.WIDTH)));
+        this.height = Integer.parseInt(configData.getOrDefault(HEIGHT, String.valueOf(Defaults.HEIGHT)));
+        this.appName = configData.getOrDefault(APP_NAME, Defaults.APP_NAME);
+        this.appVersion = configData.getOrDefault(APP_VERSION, Defaults.APP_VERSION);
+        this.iconPath = configData.get(ICON_PATH);
         icon = loadIcon();
+    }
+    
+    public String getDataDir() {
+        return dataDir;
     }
     
     public int getWidth() {
@@ -115,24 +126,31 @@ public class Config {
     }
     
     private Image loadIcon() {
-        File iconFile = new File(iconPath);
-        if (!iconFile.exists()) {
-            copyIconToAppDataDir();
+        String path = iconPath;
+        if (path == null) {
+            path = Defaults.ICON_PATH;
+        }
+        File iconFile = new File(path);
+        // Check if the icon file exists in the app data directory and copy if it doesn't
+        File dataDirIconFile = new File(dataDir + File.separator + iconFile.getName());
+        if (!dataDirIconFile.exists()) {
+            FileUtil.copyImageToDirectory(iconFile.getPath(), dataDir);
         }
         try {
             return ImageIO.read(iconFile);
         } catch (IOException e) {
-            LOGGER.error("Unable to read icon from path: {}", iconPath);
+            LOGGER.error("Unable to read icon from path: {}", path);
         }
         return null;
     }
     
-    private void copyIconToAppDataDir() {
-        try {
-            BufferedImage image = ImageIO.read(Objects.requireNonNull(Defaults.DEFAULT_ICON_PATH));
-            ImageIO.write(image, "png", new File(getIconPath()));
-        } catch (IOException e) {
-            LOGGER.error("Could not copy icon to app data dir", e);
-        }
+    public Map<String, String> getConfigMap() {
+        return Map.of(
+                WIDTH, String.valueOf(width),
+                HEIGHT, String.valueOf(height),
+                ICON_PATH, String.valueOf(iconPath),
+                APP_NAME, String.valueOf(appName),
+                APP_VERSION, String.valueOf(appVersion)
+                     );
     }
 }

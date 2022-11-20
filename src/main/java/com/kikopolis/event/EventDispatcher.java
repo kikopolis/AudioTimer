@@ -1,5 +1,5 @@
 package com.kikopolis.event;
 
 public interface EventDispatcher {
-    void dispatch(Event event);
+    void dispatch(final Event event);
 }
