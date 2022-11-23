@@ -3,6 +3,7 @@ package com.kikopolis.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.Configuration;
+import com.kikopolis.core.logging.LogConfiguration;
 import com.kikopolis.episode.EpisodeManager;
 import com.kikopolis.event.TestEscapePressedEvent;
 import com.kikopolis.gui.frame.ApplicationMainWindow;
@@ -11,6 +12,9 @@ import com.kikopolis.util.DirectoryUtil;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class App {
     // TODO: Make main window that would hold the episode list, and misc config
@@ -20,11 +24,17 @@ public class App {
     // TODO: Implement a wide range of audio file formats
     public static void main(String[] args) {
         // First make sure our data directory exists
-        DirectoryUtil.createDirectoryIfNotExists(DirectoryUtil.DATA_DIR);
+        createAppDataDirectory();
         //Create Guice injector and configure dependencies in AppModule
         Injector injector = Guice.createInjector(new DependencyBindings());
-        
+        // Load the configuration
         Configuration config = injector.getInstance(Configuration.class);
+        // Initialize logging, should either be done before any logging is done or a fallback logger should be configured.
+        // However, the fallback logger should be cleared before configuring the actual logging in the application.
+        // Or don't configure a logger here at all, configure it in some other way... Whatever you want. It's fine.
+        // I'm a passive-aggressive comment, not a cop.
+        LogConfiguration logConfiguration = injector.getInstance(LogConfiguration.class);
+        logConfiguration.configure();
         
         EpisodeManager episodeManager = injector.getInstance(EpisodeManager.class);
         
@@ -40,6 +50,14 @@ public class App {
         }));
         
         addCloseListener();
+    }
+    
+    private static void createAppDataDirectory() {
+        try {
+            Files.createDirectories(new File(DirectoryUtil.DATA_DIR).toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("Can not create app data directory", e);
+        }
     }
     
     private static void addCloseListener() {

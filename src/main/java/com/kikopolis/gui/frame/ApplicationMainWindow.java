@@ -1,8 +1,8 @@
 package com.kikopolis.gui.frame;
 
-import com.kikopolis.core.Events;
-import com.kikopolis.config.ConfigParam;
+import com.kikopolis.config.ConfigKey;
 import com.kikopolis.config.Configuration;
+import com.kikopolis.core.Events;
 import com.kikopolis.episode.EpisodeManager;
 import com.kikopolis.event.EventSubscriber;
 import com.kikopolis.event.TestEscapePressedEvent;
@@ -20,7 +20,7 @@ public class ApplicationMainWindow extends JFrame implements EventSubscriber {
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
     private final transient Configuration config;
-    private EpisodeManager episodeManager;
+    private final transient EpisodeManager episodeManager;
     
     public ApplicationMainWindow(final Configuration config, final EpisodeManager episodeManager) {
         Events.subscribe(this);
@@ -52,8 +52,8 @@ public class ApplicationMainWindow extends JFrame implements EventSubscriber {
     }
     
     private void configureWindow() {
-        setTitle(config.get(ConfigParam.APP_NAME));
-        setSize(config.getInt(ConfigParam.WIDTH), config.getInt(ConfigParam.HEIGHT));
+        setTitle(config.get(ConfigKey.APP_NAME_KEY));
+        setSize(config.getInt(ConfigKey.WIDTH_KEY), config.getInt(ConfigKey.HEIGHT_KEY));
         setIconImage(config.loadAppIcon());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

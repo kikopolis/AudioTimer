@@ -1,6 +1,7 @@
 package com.kikopolis.config;
 
 import com.google.inject.Inject;
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,16 +17,18 @@ import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
 
 import static com.kikopolis.util.DirectoryUtil.DATA_DIR;
-import static com.kikopolis.util.SystemInfo.isLinux;
-import static com.kikopolis.util.SystemInfo.isMacOs;
-import static com.kikopolis.util.SystemInfo.isWindows;
 
 public class AppConfig implements Configuration {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConfig.class);
     private final ConfigWriterAndReader configWriterAndReader;
     private final Map<String, String> configData;
     private static final List<String>
-            ALLOWED_TO_READ_AND_WRITE = List.of(ConfigParam.HEIGHT.getKey(), ConfigParam.WIDTH.getKey(), ConfigParam.ICON_PATH.getKey());
+            ALLOWED_TO_READ_AND_WRITE = List.of(
+            ConfigKey.HEIGHT_KEY.getKey(),
+            ConfigKey.WIDTH_KEY.getKey(),
+            ConfigKey.ICON_PATH_KEY.getKey(),
+            ConfigKey.LOG_FILE_PATH_KEY.getKey()
+                                               );
     private final StampedLock lock;
     
     @Inject
@@ -44,18 +47,18 @@ public class AppConfig implements Configuration {
     private Map<String, String> readAndValidateConfigData() {
         Map<String, String> rawData = configWriterAndReader.read();
         Map<String, String> validatedData = new HashMap<>();
-        for (ConfigParam configParam : ConfigParam.values()) {
-            if (rawData.containsKey(configParam.getKey()) && ALLOWED_TO_READ_AND_WRITE.contains(configParam.getKey())) {
-                validatedData.put(configParam.getKey(), rawData.get(configParam.getKey()));
+        for (ConfigKey configKey : ConfigKey.values()) {
+            if (rawData.containsKey(configKey.getKey()) && ALLOWED_TO_READ_AND_WRITE.contains(configKey.getKey())) {
+                validatedData.put(configKey.getKey(), rawData.get(configKey.getKey()));
             } else {
-                validatedData.put(configParam.getKey(), ConfigDefaults.getDefaultValue(configParam));
+                validatedData.put(configKey.getKey(), ConfigDefaults.getDefaultValue(configKey));
             }
         }
         return validatedData;
     }
     
     @Override
-    public String get(ConfigParam key) {
+    public String get(ConfigKey key) {
         final long stamp = lock.readLock();
         try {
             return configData.getOrDefault(key.getKey(), null);
@@ -65,7 +68,7 @@ public class AppConfig implements Configuration {
     }
     
     @Override
-    public Integer getInt(ConfigParam key) {
+    public Integer getInt(ConfigKey key) {
         final long stamp = lock.readLock();
         try {
             return Integer.parseInt(configData.getOrDefault(key.getKey(), null));
@@ -75,7 +78,7 @@ public class AppConfig implements Configuration {
     }
     
     @Override
-    public void set(ConfigParam key, String value) {
+    public void set(ConfigKey key, String value) {
         final long stamp = lock.writeLock();
         try {
             configData.put(key.getKey(), value);
@@ -87,11 +90,11 @@ public class AppConfig implements Configuration {
     
     public void save() {
         HashMap<String, String> dataToSave = new HashMap<>();
-        for (ConfigParam configParam : ConfigParam.values()) {
-            if (ALLOWED_TO_READ_AND_WRITE.contains(configParam.getKey())) {
+        for (ConfigKey configKey : ConfigKey.values()) {
+            if (ALLOWED_TO_READ_AND_WRITE.contains(configKey.getKey())) {
                 final long stamp = lock.readLock();
                 try {
-                    dataToSave.put(configParam.getKey(), configData.get(configParam.getKey()));
+                    dataToSave.put(configKey.getKey(), configData.get(configKey.getKey()));
                 } finally {
                     lock.unlockRead(stamp);
                 }
@@ -102,7 +105,7 @@ public class AppConfig implements Configuration {
     
     public Image loadAppIcon() {
         BufferedImage icon = null;
-        String path = get(ConfigParam.ICON_PATH);
+        String path = get(ConfigKey.ICON_PATH_KEY);
         if (path == null) {
             path = ConfigDefaults.ICON_PATH.getValue();
         }
@@ -114,7 +117,7 @@ public class AppConfig implements Configuration {
         }
         try {
             icon = ImageIO.read(dataDirIconFile);
-            set(ConfigParam.ICON_PATH, dataDirIconFile.getPath());
+            set(ConfigKey.ICON_PATH_KEY, dataDirIconFile.getPath());
         } catch (IOException e) {
             LOGGER.error("Unable to read icon from path: {}", path);
         }
@@ -134,19 +137,19 @@ public class AppConfig implements Configuration {
     }
     
     public void setDefaultsByOperatingSystem() {
-        if (isMacOs()) {
+        if (SystemUtils.IS_OS_MAC_OSX) {
             setMacConfig();
-        } else if (isWindows()) {
+        } else if (SystemUtils.IS_OS_WINDOWS) {
             setWindowsConfig();
-        } else if (isLinux()) {
+        } else if (SystemUtils.IS_OS_LINUX) {
             setLinuxConfig();
         }
     }
     
     private void setMacConfig() {
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("apple.awt.application.name", get(ConfigParam.APP_NAME));
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", get(ConfigParam.APP_NAME));
+        System.setProperty("apple.awt.application.name", get(ConfigKey.APP_NAME_KEY));
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", get(ConfigKey.APP_NAME_KEY));
         System.setProperty("apple.awt.application.appearance", "system");
     }
     

@@ -2,7 +2,6 @@ package com.kikopolis.config;
 
 import com.google.inject.Inject;
 import com.kikopolis.util.DirectoryUtil;
-import com.kikopolis.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,21 +40,26 @@ public class ConfigWriterAndReaderKeyValue implements ConfigWriterAndReader {
     @Override
     public Map<String, String> read() {
         HashMap<String, String> configMap = new HashMap<>();
-        if (!FileUtil.createFileIfNotExists(configFilePath)) {
-            return configMap;
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(configFilePath))) {
-            String line = br.readLine();
-            while (line != null) {
-                if (line.contains("=")) {
-                    String[] split = line.split("=");
-                    configMap.put(split[0], split[1]);
+        if (canReadConfigFile(new File(configFilePath))) {
+            try (BufferedReader br = new BufferedReader(new FileReader(configFilePath))) {
+                String line = br.readLine();
+                while (line != null) {
+                    if (line.contains("=")) {
+                        String[] split = line.split("=");
+                        configMap.put(split[0], split[1]);
+                    }
+                    line = br.readLine();
                 }
-                line = br.readLine();
+            } catch (IOException e) {
+                LOGGER.error("%{}. Using DEFAULT configuration.", e.getMessage());
             }
-        } catch (IOException e) {
-            LOGGER.error("%{}. Using DEFAULT configuration.", e.getMessage());
+        } else {
+            LOGGER.error("Unable to read config file. Using DEFAULT configuration.");
         }
         return configMap;
+    }
+    
+    private boolean canReadConfigFile(final File file) {
+        return file.exists() && file.canRead();
     }
 }
