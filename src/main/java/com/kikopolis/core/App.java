@@ -3,7 +3,7 @@ package com.kikopolis.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.Configuration;
-import com.kikopolis.core.logging.LogConfiguration;
+import com.kikopolis.config.logging.LogConfiguration;
 import com.kikopolis.episode.EpisodeManager;
 import com.kikopolis.event.TestEscapePressedEvent;
 import com.kikopolis.gui.frame.ApplicationMainWindow;

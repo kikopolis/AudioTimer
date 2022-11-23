@@ -1,4 +1,4 @@
-package com.kikopolis.core.logging;
+package com.kikopolis.config.logging;
 
 import com.google.inject.Inject;
 import com.kikopolis.config.ConfigKey;
@@ -10,6 +10,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.Priority;
 import org.apache.log4j.RollingFileAppender;
 
 import java.io.File;
@@ -21,6 +22,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     private static final String LOG_DIR_PATH_LINUX = "%svar%slog%skikopolis".formatted(File.separator, File.separator, File.separator);
     private static final String LOG_DIR_PATH_WINDOWS = "C:%sProgramData%sKikopolis".formatted(File.separator, File.separator);
     private static final String LOG_FILE_NAME = "audio_timer.log";
+    private static final Priority LOGGER_LEVEL = Level.DEBUG;
     private final Configuration configuration;
     
     @Inject
@@ -31,7 +33,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     public void configure() {
         // Remove the fallback logger before appending a new console logger, otherwise we get duplicate logs
         Logger.getRootLogger().removeAllAppenders();
-        Logger.getRootLogger().setLevel(Level.ALL);
+        Logger.getRootLogger().setLevel(Level.DEBUG);
         configureConsoleAppender();
         configureFileAppender();
     }
@@ -39,7 +41,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     private void configureConsoleAppender() {
         ConsoleAppender consoleAppender = new ConsoleAppender();
         consoleAppender.setLayout(getLayout());
-        consoleAppender.setThreshold(Level.DEBUG);
+        consoleAppender.setThreshold(LOGGER_LEVEL);
         consoleAppender.activateOptions();
         Logger.getRootLogger().addAppender(consoleAppender);
     }
@@ -53,7 +55,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
         FileAppender fileAppender = new RollingFileAppender();
         fileAppender.setFile(logFile.getPath());
         fileAppender.setLayout(getLayout());
-        fileAppender.setThreshold(Level.DEBUG);
+        fileAppender.setThreshold(LOGGER_LEVEL);
         fileAppender.setImmediateFlush(true);
         fileAppender.setAppend(true);
         fileAppender.activateOptions();
@@ -61,12 +63,11 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     }
     
     private File verifyOrCreateLogFile() {
-        File logFile;
-        // if a log file is in config and the file exists, use that
         File configLogFile = new File(configuration.get(ConfigKey.LOG_FILE_PATH_KEY));
         if (configLogFile.exists()) {
             return configLogFile;
         }
+        File logFile;
         File osLogFile = getOsSpecificLogFile();
         File fallbackLogFile = getFallbackLogFile();
         if (createLogFile(osLogFile)) {
@@ -74,11 +75,11 @@ public class Slf4JLogConfiguration implements LogConfiguration {
         } else if (createLogFile(fallbackLogFile)) {
             logFile = fallbackLogFile;
         } else {
-            LOGGER.error("Unable to create log file. Logging to console only.");
+            LOGGER.error("Unable to create log files. Logging to console only.");
             return null;
         }
         if (logFile.getPath().equals(fallbackLogFile.getPath())) {
-            LOGGER.warn("Unable to create log file in OS specific location. Logging to " + logFile.getPath());
+            LOGGER.warn("Unable to create log file in OS specific location. Logging to \"%s\"".formatted(logFile.getPath()));
         }
         configuration.set(ConfigKey.LOG_FILE_PATH_KEY, logFile.getPath());
         return logFile;
@@ -99,20 +100,20 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     }
     
     private void createDir(final File dir) {
-        LOGGER.debug("Creating logging directory - %s".formatted(dir.getPath()));
+        LOGGER.debug("Creating logging directory - \"%s\"".formatted(dir.getPath()));
         try {
             Files.createDirectories(dir.toPath());
         } catch (IOException e) {
-            LOGGER.error("Could not create logging directory - %s".formatted(dir.getPath()));
+            LOGGER.error("Could not create logging directory - \"%s\"".formatted(dir.getPath()));
         }
     }
     
     private void createFile(final File file) {
-        LOGGER.debug("Creating log file - %s".formatted(file.getPath()));
+        LOGGER.debug("Creating log file - \"%s\"".formatted(file.getPath()));
         try {
             Files.createFile(file.toPath());
         } catch (IOException e) {
-            LOGGER.error("Could not create log file - %s".formatted(file.getPath()));
+            LOGGER.error("Could not create log file - \"%s\"".formatted(file.getPath()));
         }
     }
     

@@ -1,4 +1,4 @@
-package com.kikopolis.core.logging;
+package com.kikopolis.config.logging;
 
 public interface LogConfiguration {
     void configure();
