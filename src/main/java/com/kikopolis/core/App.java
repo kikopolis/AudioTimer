@@ -1,4 +1,4 @@
-package com.kikopolis;
+package com.kikopolis.core;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

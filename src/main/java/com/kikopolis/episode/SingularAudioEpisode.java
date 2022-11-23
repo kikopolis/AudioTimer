@@ -47,9 +47,9 @@ public final class SingularAudioEpisode extends AudioEpisode {
     }
     
     @Override
-    public boolean isValid() {
-        return super.isValid()
-                && date != null
-                && date != EMPTY_DATE;
+    public boolean isInvalid() {
+        return super.isInvalid()
+                || date == null
+                || date == EMPTY_DATE;
     }
 }

@@ -91,10 +91,10 @@ public abstract sealed class AudioEpisode implements Serializable permits Recurr
     
     public abstract Iterable<String> toCsv();
     
-    public boolean isValid() {
-        return !name.equals(EMPTY_NAME)
-                && !sound.equals(EMPTY_SOUND)
-                && !Objects.equals(hour, EMPTY_HOUR)
-                && !Objects.equals(minute, EMPTY_MINUTE);
+    public boolean isInvalid() {
+        return name.equals(EMPTY_NAME)
+                || sound.equals(EMPTY_SOUND)
+                || Objects.equals(hour, EMPTY_HOUR)
+                || Objects.equals(minute, EMPTY_MINUTE);
     }
 }

@@ -11,6 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 
+import static com.kikopolis.util.Randomizer.randomDayOfMonth;
+import static com.kikopolis.util.Randomizer.randomDayOfWeek;
+import static com.kikopolis.util.Randomizer.randomHour;
+import static com.kikopolis.util.Randomizer.randomMinute;
+import static com.kikopolis.util.Randomizer.randomMonth;
+import static com.kikopolis.util.Randomizer.randomNumber;
+
 public class EpisodeManagerWithScheduler implements EpisodeManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpisodeManagerWithScheduler.class.getName());
     private final EpisodeWriterAndReader episodeWriterAndReader;
@@ -22,12 +29,42 @@ public class EpisodeManagerWithScheduler implements EpisodeManager {
         this.episodeWriterAndReader = episodeWriterAndReader;
         episodes = new ArrayList<>();
         lock = new StampedLock();
+        
+        // TODO: write test episodes to file
+        for (int i = 0; i < 29; i++) {
+            episodes.add(randomSingularEpisode());
+        }
+        for (int i = 0; i < 56; i++) {
+            episodes.add(randomRecurringEpisode());
+        }
+        save();
+    }
+    
+    private AudioEpisode randomRecurringEpisode() {
+        return new RecurringAudioEpisode(
+                "Test Episode %s".formatted(randomNumber(1000)),
+                "sound%s.wav".formatted(randomNumber(1000)),
+                randomHour(),
+                randomMinute(),
+                randomDayOfWeek(),
+                randomDayOfWeek()
+        );
+    }
+    
+    private AudioEpisode randomSingularEpisode() {
+        return new SingularAudioEpisode(
+                "Test Episode %s".formatted(randomNumber(1000)),
+                "sound%s.wav".formatted(randomNumber(1000)),
+                randomHour(),
+                randomMinute(),
+                false,
+                LocalDate.of(2023, randomMonth(), randomDayOfMonth())
+        );
     }
     
     public void save() {
         long stamp = lock.writeLock();
         try {
-            purgeEpisodes();
             episodeWriterAndReader.write(episodes);
         } finally {
             lock.unlockWrite(stamp);
@@ -40,7 +77,6 @@ public class EpisodeManagerWithScheduler implements EpisodeManager {
         try {
             episodes.add(episode);
             LOGGER.debug("Added episode: {}", episode);
-            purgeEpisodes();
         } finally {
             lock.unlockWrite(stamp);
         }
@@ -64,10 +100,10 @@ public class EpisodeManagerWithScheduler implements EpisodeManager {
             if (episodes.isEmpty()) {
                 setEpisodes(episodeWriterAndReader.read());
             }
-            purgeEpisodes();
             setRunTimes();
             for (AudioEpisode episode : episodes) {
                 if (episode.isReadyForDispatch()) {
+                    LOGGER.info("Dispatching episode: {}", episode);
                     // TODO : dispatch episode
                 }
             }
@@ -89,13 +125,39 @@ public class EpisodeManagerWithScheduler implements EpisodeManager {
     
     @Override
     public void setEpisodes(List<AudioEpisode> episodes) {
+        deleteAll();
         long stamp = lock.writeLock();
         try {
-            this.episodes.clear();
             if (episodes != null) {
                 this.episodes.addAll(episodes);
             }
-            purgeEpisodes();
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+    
+    public void purgeInvalid() {
+        long stamp = lock.writeLock();
+        try {
+            episodes.removeIf(AudioEpisode::isInvalid);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+    
+    public void purgeDispatched() {
+        long stamp = lock.writeLock();
+        try {
+            episodes.removeIf(episode -> episode instanceof SingularAudioEpisode && episode.isDispatched());
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+    
+    public void deleteAll() {
+        long stamp = lock.writeLock();
+        try {
+            episodes.clear();
         } finally {
             lock.unlockWrite(stamp);
         }
@@ -115,10 +177,6 @@ public class EpisodeManagerWithScheduler implements EpisodeManager {
         CurrentTimeHolder.setHour(null);
         CurrentTimeHolder.setMinute(null);
         LOGGER.debug("Cleared current run times.");
-    }
-    
-    private void purgeEpisodes() {
-        episodes.removeIf(episode -> episode.isValid() && !episode.isDispatched());
     }
     
     public static final class CurrentTimeHolder {

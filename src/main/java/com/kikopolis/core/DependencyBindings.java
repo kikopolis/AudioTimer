@@ -1,4 +1,4 @@
-package com.kikopolis;
+package com.kikopolis.core;
 
 import com.google.inject.AbstractModule;
 import com.kikopolis.config.AppConfig;

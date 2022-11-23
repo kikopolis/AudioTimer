@@ -66,9 +66,9 @@ public final class RecurringAudioEpisode extends AudioEpisode {
     }
     
     @Override
-    public boolean isValid() {
-        return super.isValid()
-                && dayOfWeek != DayOfWeek.EMPTY_DAY_OF_WEEK
-                && dispatchedOnLatest != DayOfWeek.EMPTY_DAY_OF_WEEK;
+    public boolean isInvalid() {
+        return super.isInvalid()
+                || dayOfWeek == DayOfWeek.EMPTY_DAY_OF_WEEK
+                || dispatchedOnLatest == DayOfWeek.EMPTY_DAY_OF_WEEK;
     }
 }

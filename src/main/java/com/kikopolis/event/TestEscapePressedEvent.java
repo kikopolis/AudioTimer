@@ -1,6 +1,6 @@
 package com.kikopolis.event;
 
-public class TestEscapePressedEvent {
+public class TestEscapePressedEvent implements Event {
     private final String message;
     
     public TestEscapePressedEvent(final String message) {

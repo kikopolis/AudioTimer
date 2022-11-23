@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SchedulerByInterval implements Scheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerByInterval.class.getName());
     private static final AtomicBoolean running = new AtomicBoolean(false);
-    private static final int INTERVAL = 1000;
+    private static final int INTERVAL = 1000 * 30;
     private final Timer timer;
     private final EpisodeManager episodeManager;
     
