@@ -3,8 +3,8 @@ package com.kikopolis.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.logging.LogConfiguration;
-import com.kikopolis.event.episode.SaveEpisodeListEvent;
-import com.kikopolis.gui.frame.ApplicationMainWindow;
+import com.kikopolis.event.TestEventWriter;
+import com.kikopolis.gui.window.Main;
 import com.kikopolis.schedule.Scheduler;
 import com.kikopolis.util.DirectoryUtil;
 
@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 public class App {
-    // TODO: Make main window that would hold the episode list, and misc config
-    // TODO: Make episode editor with choices - time, day or date, repeatable, unique or default sound
+    // TODO: Make main window that would hold the event list, and misc config
+    // TODO: Make event editor with choices - time, day or date, repeatable, unique or default sound
     // TODO: Make audio selection window with a test player and enable audio length limiting in the config
     // TODO: Implement configuration adapter, ie. independent of the configuration file format or data location
     // TODO: Implement a wide range of audio file formats
@@ -35,14 +35,10 @@ public class App {
         
         scheduler.start();
         
-        ApplicationMainWindow appMainWindow = injector.getInstance(ApplicationMainWindow.class);
+        Main appMainWindow = injector.getInstance(Main.class);
         appMainWindow.setVisible(true);
         
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // TODO: throw save events for config and episode list
-//            Events.post(new SaveConfigEvent());
-            Events.post(new SaveEpisodeListEvent());
-        }));
+        new TestEventWriter();
         
         addCloseListener();
     }
@@ -57,6 +53,7 @@ public class App {
         }
     }
     
+    // TODO: remove this after testing is done
     private static void addCloseListener() {
         // close when escape is pressed
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {

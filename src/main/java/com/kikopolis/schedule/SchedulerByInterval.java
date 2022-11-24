@@ -2,7 +2,7 @@ package com.kikopolis.schedule;
 
 import com.google.inject.Inject;
 import com.kikopolis.core.Events;
-import com.kikopolis.event.episode.CheckEpisodesForDispatchEvent;
+import com.kikopolis.eventbus.event.CheckEventsForDispatchBusEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class SchedulerByInterval implements Scheduler {
         return new TimerTask() {
             @Override
             public void run() {
-                Events.post(new CheckEpisodesForDispatchEvent());
+                Events.post(new CheckEventsForDispatchBusEvent());
             }
         };
     }

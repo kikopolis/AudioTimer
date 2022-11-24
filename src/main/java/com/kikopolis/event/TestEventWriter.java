@@ -1,8 +1,7 @@
-package com.kikopolis.episode;
+package com.kikopolis.event;
 
-import com.google.inject.Inject;
 import com.kikopolis.core.Events;
-import com.kikopolis.event.episode.SaveEpisodeListEvent;
+import com.kikopolis.eventbus.event.SaveEventListBusEvent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,21 +14,21 @@ import static com.kikopolis.util.Randomizer.randomMinute;
 import static com.kikopolis.util.Randomizer.randomMonth;
 import static com.kikopolis.util.Randomizer.randomNumber;
 
-public class TestEpisodeWriter {
-    public TestEpisodeWriter() {
-        List<AudioEpisode> episodes = new ArrayList<>();
+public class TestEventWriter {
+    public TestEventWriter() {
+        List<AudioEvent> events = new ArrayList<>();
         for (int i = 0; i < 29; i++) {
-            episodes.add(randomSingularEpisode());
+            events.add(randomSingularEvent());
         }
         for (int i = 0; i < 56; i++) {
-            episodes.add(randomRecurringEpisode());
+            events.add(randomRecurringEvent());
         }
-        Events.post(new SaveEpisodeListEvent(episodes));
+        Events.post(new SaveEventListBusEvent(events));
     }
     
-    private AudioEpisode randomRecurringEpisode() {
-        return new RecurringAudioEpisode(
-                "Test Episode %s".formatted(randomNumber(1000)),
+    private AudioEvent randomRecurringEvent() {
+        return new RecurringAudioEvent(
+                "Test Event %s".formatted(randomNumber(1000)),
                 "sound%s.wav".formatted(randomNumber(1000)),
                 randomHour(),
                 randomMinute(),
@@ -38,9 +37,9 @@ public class TestEpisodeWriter {
         );
     }
     
-    private AudioEpisode randomSingularEpisode() {
-        return new SingularAudioEpisode(
-                "Test Episode %s".formatted(randomNumber(1000)),
+    private AudioEvent randomSingularEvent() {
+        return new SingularAudioEvent(
+                "Test Event %s".formatted(randomNumber(1000)),
                 "sound%s.wav".formatted(randomNumber(1000)),
                 randomHour(),
                 randomMinute(),

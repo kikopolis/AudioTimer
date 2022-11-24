@@ -48,11 +48,23 @@ public class ConfigService {
         return DEFAULTS;
     }
     
+    public static Color getMainColor() {
+        return new Color(56, 159, 190);
+    }
+    
+    public static Color getHighlightColor() {
+        return new Color(142, 150, 0);
+    }
+    
+    public static Color getBackgroundColor() {
+        return new Color(232, 232, 232);
+    }
+    
     public String get(final ConfigKey key) {
         String value = configRepository.get(key);
         if (value == null && DEFAULTS.containsKey(key)) {
             value = DEFAULTS.get(key);
-        } else {
+        } else if (value == null) {
             LOGGER.error("No value found for key: \"{}\" in config file, or default", key.getKey());
         }
         return value;
