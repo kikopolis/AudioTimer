@@ -1,6 +1,6 @@
 package com.kikopolis.episode;
 
-import com.kikopolis.episode.EpisodeManagerInterfaceWithScheduler.CurrentTimeHolder;
+import com.kikopolis.service.CurrentDispatchTimeService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,9 +28,9 @@ public final class SingularAudioEpisode extends AudioEpisode {
     @Override
     public boolean isReadyForDispatch() {
         return !isDispatched() &&
-                date.equals(CurrentTimeHolder.getDate()) &&
-                Objects.equals(getHour(), CurrentTimeHolder.getHour()) &&
-                Objects.equals(getMinute(), CurrentTimeHolder.getMinute());
+                date.equals(CurrentDispatchTimeService.getDate()) &&
+                Objects.equals(getHour(), CurrentDispatchTimeService.getHour()) &&
+                Objects.equals(getMinute(), CurrentDispatchTimeService.getMinute());
     }
     
     @Override

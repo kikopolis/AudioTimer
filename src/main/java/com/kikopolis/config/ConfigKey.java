@@ -14,6 +14,15 @@ public enum ConfigKey {
         this.key = key;
     }
     
+    public static ConfigKey fromString(String key) {
+        for (ConfigKey configKey : ConfigKey.values()) {
+            if (configKey.key.equalsIgnoreCase(key)) {
+                return configKey;
+            }
+        }
+        return null;
+    }
+    
     public String getKey() {
         return key;
     }

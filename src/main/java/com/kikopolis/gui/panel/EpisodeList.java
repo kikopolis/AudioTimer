@@ -21,6 +21,7 @@ public class EpisodeList extends JPanel implements EventSubscriber {
         Events.subscribe(this);
     }
     
+    // TODO: figure out to refactor to service maybe?
     @Subscribe(threadMode = ThreadMode.MAIN, priority = Priority.LOWEST)
     public void refreshEpisodes(final EpisodeListRefreshEvent event) {
         removeAll();

@@ -2,7 +2,8 @@ package com.kikopolis.config.logging;
 
 import com.google.inject.Inject;
 import com.kikopolis.config.ConfigKey;
-import com.kikopolis.config.Configuration;
+import com.kikopolis.repository.ConfigRepository;
+import com.kikopolis.service.ConfigService;
 import com.kikopolis.util.DirectoryUtil;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.log4j.FileAppender;
@@ -22,11 +23,11 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     private static final String LOG_DIR_PATH_WINDOWS = "C:%sProgramData%sKikopolis".formatted(File.separator, File.separator);
     private static final String LOG_FILE_NAME = "audio_timer.log";
     private static final Priority LOGGER_LEVEL = Level.DEBUG;
-    private final Configuration configuration;
+    private final ConfigService configService;
     
     @Inject
-    public Slf4JLogConfiguration(final Configuration configuration) {
-        this.configuration = configuration;
+    public Slf4JLogConfiguration(final ConfigService configService) {
+        this.configService = configService;
     }
     
     public void configure() {
@@ -51,7 +52,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     }
     
     private File verifyOrCreateLogFile() {
-        File configLogFile = new File(configuration.get(ConfigKey.LOG_FILE_PATH_KEY));
+        File configLogFile = new File(configService.get(ConfigKey.LOG_FILE_PATH_KEY));
         if (configLogFile.exists()) {
             return configLogFile;
         }
@@ -69,7 +70,7 @@ public class Slf4JLogConfiguration implements LogConfiguration {
         if (logFile.getPath().equals(fallbackLogFile.getPath())) {
             LOGGER.warn("Unable to create log file in OS specific location. Logging to \"%s\"".formatted(logFile.getPath()));
         }
-        configuration.set(ConfigKey.LOG_FILE_PATH_KEY, logFile.getPath());
+        configService.set(ConfigKey.LOG_FILE_PATH_KEY, logFile.getPath());
         return logFile;
     }
     

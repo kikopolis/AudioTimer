@@ -6,14 +6,14 @@ import com.kikopolis.event.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpisodeListRefreshEvent implements Event {
+public class CheckEpisodesForDispatchEvent implements Event {
     private List<AudioEpisode> episodes;
     
-    public EpisodeListRefreshEvent() {
+    public CheckEpisodesForDispatchEvent() {
         this.episodes = new ArrayList<>();
     }
     
-    public EpisodeListRefreshEvent(List<AudioEpisode> episodes) {
+    public CheckEpisodesForDispatchEvent(List<AudioEpisode> episodes) {
         this.episodes = episodes;
     }
     

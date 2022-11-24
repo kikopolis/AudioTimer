@@ -1,9 +1,10 @@
 package com.kikopolis.gui.frame;
 
+import com.google.inject.Inject;
 import com.kikopolis.config.ConfigKey;
-import com.kikopolis.config.Configuration;
 import com.kikopolis.gui.button.RefreshButton;
 import com.kikopolis.gui.panel.EpisodeList;
+import com.kikopolis.service.ConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +15,11 @@ public class ApplicationMainWindow extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainWindow.class.getName());
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
-    private final transient Configuration config;
+    private final transient ConfigService configService;
     
-    public ApplicationMainWindow(final Configuration config) {
-        this.config = config;
+    @Inject
+    public ApplicationMainWindow(final ConfigService configService) {
+        this.configService = configService;
         init();
         
         // Add a button to refresh the event list
@@ -39,9 +41,9 @@ public class ApplicationMainWindow extends JFrame {
     }
     
     private void configureWindow() {
-        setTitle(config.get(ConfigKey.APP_NAME_KEY));
-        setSize(config.getInt(ConfigKey.WIDTH_KEY), config.getInt(ConfigKey.HEIGHT_KEY));
-        setIconImage(config.loadAppIcon());
+        setTitle(configService.get(ConfigKey.APP_NAME_KEY));
+        setSize(configService.getInt(ConfigKey.WIDTH_KEY), configService.getInt(ConfigKey.HEIGHT_KEY));
+        setIconImage(configService.loadAppIcon());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);

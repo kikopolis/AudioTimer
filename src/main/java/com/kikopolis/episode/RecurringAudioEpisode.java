@@ -1,6 +1,6 @@
 package com.kikopolis.episode;
 
-import com.kikopolis.episode.EpisodeManagerInterfaceWithScheduler.CurrentTimeHolder;
+import com.kikopolis.service.CurrentDispatchTimeService;
 import com.kikopolis.util.DayOfWeek;
 
 import java.util.List;
@@ -39,17 +39,17 @@ public final class RecurringAudioEpisode extends AudioEpisode {
     @Override
     public void setDispatched(boolean dispatched) {
         if (dispatched) {
-            dispatchedOnLatest = CurrentTimeHolder.getDayOfWeek();
+            dispatchedOnLatest = CurrentDispatchTimeService.getDayOfWeek();
         }
         super.setDispatched(false);
     }
     
     @Override
     public boolean isReadyForDispatch() {
-        return dispatchedOnLatest != CurrentTimeHolder.getDayOfWeek() &&
-                dayOfWeek == CurrentTimeHolder.getDayOfWeek() &&
-                Objects.equals(getHour(), CurrentTimeHolder.getHour()) &&
-                Objects.equals(getMinute(), CurrentTimeHolder.getMinute());
+        return dispatchedOnLatest != CurrentDispatchTimeService.getDayOfWeek() &&
+                dayOfWeek == CurrentDispatchTimeService.getDayOfWeek() &&
+                Objects.equals(getHour(), CurrentDispatchTimeService.getHour()) &&
+                Objects.equals(getMinute(), CurrentDispatchTimeService.getMinute());
     }
     
     @Override

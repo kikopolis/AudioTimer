@@ -3,7 +3,6 @@ package com.kikopolis.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.logging.LogConfiguration;
-import com.kikopolis.event.config.SaveConfigEvent;
 import com.kikopolis.event.episode.SaveEpisodeListEvent;
 import com.kikopolis.gui.frame.ApplicationMainWindow;
 import com.kikopolis.schedule.Scheduler;
@@ -41,7 +40,7 @@ public class App {
         
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // TODO: throw save events for config and episode list
-            Events.post(new SaveConfigEvent());
+//            Events.post(new SaveConfigEvent());
             Events.post(new SaveEpisodeListEvent());
         }));
         
