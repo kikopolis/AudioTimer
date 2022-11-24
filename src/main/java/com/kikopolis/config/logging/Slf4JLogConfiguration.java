@@ -5,7 +5,6 @@ import com.kikopolis.config.ConfigKey;
 import com.kikopolis.config.Configuration;
 import com.kikopolis.util.DirectoryUtil;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,19 +30,8 @@ public class Slf4JLogConfiguration implements LogConfiguration {
     }
     
     public void configure() {
-        // Remove the fallback logger before appending a new console logger, otherwise we get duplicate logs
-        Logger.getRootLogger().removeAllAppenders();
         Logger.getRootLogger().setLevel(Level.DEBUG);
-        configureConsoleAppender();
         configureFileAppender();
-    }
-    
-    private void configureConsoleAppender() {
-        ConsoleAppender consoleAppender = new ConsoleAppender();
-        consoleAppender.setLayout(getLayout());
-        consoleAppender.setThreshold(LOGGER_LEVEL);
-        consoleAppender.activateOptions();
-        Logger.getRootLogger().addAppender(consoleAppender);
     }
     
     private void configureFileAppender() {
