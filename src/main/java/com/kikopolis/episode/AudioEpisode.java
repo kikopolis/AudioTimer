@@ -5,12 +5,14 @@ import com.kikopolis.util.DayOfWeek;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 public abstract sealed class AudioEpisode implements Serializable permits RecurringAudioEpisode, SingularAudioEpisode {
     public static final String EMPTY_NAME = "empty_name";
     public static final String EMPTY_SOUND = "empty_sound";
     public static final Integer EMPTY_HOUR = -12;
     public static final Integer EMPTY_MINUTE = -12;
+    private final UUID id;
     private String name;
     private String sound;
     private Integer hour;
@@ -18,6 +20,7 @@ public abstract sealed class AudioEpisode implements Serializable permits Recurr
     private boolean isDispatched;
     
     protected AudioEpisode(final String name, final String sound, final Integer hour, final Integer minute, final boolean isDispatched) {
+        id = UUID.randomUUID();
         this.name = name != null ? name : EMPTY_NAME;
         this.sound = sound != null ? sound : EMPTY_SOUND;
         this.hour = hour != null ? hour : EMPTY_HOUR;
@@ -45,6 +48,10 @@ public abstract sealed class AudioEpisode implements Serializable permits Recurr
             );
             default -> throw new IllegalArgumentException("Unknown Episode type: " + csv[0]);
         };
+    }
+    
+    public UUID getId() {
+        return id;
     }
     
     public String getName() {

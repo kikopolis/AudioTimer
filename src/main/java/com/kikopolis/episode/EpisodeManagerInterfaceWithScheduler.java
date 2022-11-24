@@ -18,14 +18,14 @@ import static com.kikopolis.util.Randomizer.randomMinute;
 import static com.kikopolis.util.Randomizer.randomMonth;
 import static com.kikopolis.util.Randomizer.randomNumber;
 
-public class EpisodeManagerWithScheduler implements EpisodeManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EpisodeManagerWithScheduler.class.getName());
+public class EpisodeManagerInterfaceWithScheduler implements EpisodeManagerInterface {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EpisodeManagerInterfaceWithScheduler.class.getName());
     private final EpisodeWriterAndReader episodeWriterAndReader;
     private final List<AudioEpisode> episodes;
     private final StampedLock lock;
     
     @Inject
-    public EpisodeManagerWithScheduler(final EpisodeWriterAndReader episodeWriterAndReader) {
+    public EpisodeManagerInterfaceWithScheduler(final EpisodeWriterAndReader episodeWriterAndReader) {
         this.episodeWriterAndReader = episodeWriterAndReader;
         episodes = new ArrayList<>();
         lock = new StampedLock();

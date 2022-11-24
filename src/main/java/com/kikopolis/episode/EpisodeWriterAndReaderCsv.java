@@ -19,6 +19,7 @@ import java.util.List;
 public final class EpisodeWriterAndReaderCsv implements EpisodeWriterAndReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(EpisodeWriterAndReaderCsv.class);
     private final File episodeFile;
+    // TODO: implement locking
     
     @Inject
     public EpisodeWriterAndReaderCsv() {

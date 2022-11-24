@@ -1,7 +1,7 @@
 package com.kikopolis.schedule;
 
 import com.google.inject.Inject;
-import com.kikopolis.episode.EpisodeManager;
+import com.kikopolis.episode.EpisodeManagerInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +14,12 @@ public class SchedulerByInterval implements Scheduler {
     private static final AtomicBoolean running = new AtomicBoolean(false);
     private static final int INTERVAL = 1000 * 30;
     private final Timer timer;
-    private final EpisodeManager episodeManager;
+    private final EpisodeManagerInterface episodeManagerInterface;
     
     @Inject
-    public SchedulerByInterval(final EpisodeManager episodeManager) {
+    public SchedulerByInterval(final EpisodeManagerInterface episodeManagerInterface) {
         timer = new Timer();
-        this.episodeManager = episodeManager;
+        this.episodeManagerInterface = episodeManagerInterface;
     }
     
     @Override
@@ -53,7 +53,7 @@ public class SchedulerByInterval implements Scheduler {
         return new TimerTask() {
             @Override
             public void run() {
-                episodeManager.checkAndDispatchEpisodes();
+                episodeManagerInterface.checkAndDispatchEpisodes();
             }
         };
     }

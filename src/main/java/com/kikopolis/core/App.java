@@ -2,10 +2,9 @@ package com.kikopolis.core;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.kikopolis.config.Configuration;
 import com.kikopolis.config.logging.LogConfiguration;
-import com.kikopolis.episode.EpisodeManager;
-import com.kikopolis.event.TestEscapePressedEvent;
+import com.kikopolis.event.config.SaveConfigEvent;
+import com.kikopolis.event.episode.SaveEpisodeListEvent;
 import com.kikopolis.gui.frame.ApplicationMainWindow;
 import com.kikopolis.schedule.Scheduler;
 import com.kikopolis.util.DirectoryUtil;
@@ -27,31 +26,30 @@ public class App {
         createAppDataDirectory();
         //Create Guice injector and configure dependencies in AppModule
         Injector injector = Guice.createInjector(new DependencyBindings());
-        // Load the configuration
-        Configuration config = injector.getInstance(Configuration.class);
-        // Initialize logging, should either be done before any logging is done or a fallback logger should be configured.
-        // However, the fallback logger should be cleared before configuring the actual logging in the application.
-        // Or don't configure a logger here at all, configure it in some other way... Whatever you want. It's fine.
-        // I'm a passive-aggressive comment, not a cop.
+        // Initialize logging
+        // TODO: Maybe configure logging in log4j.properties and throw exception if it fails
+        // TODO: maybe also throw when the log file is not writable etc
         LogConfiguration logConfiguration = injector.getInstance(LogConfiguration.class);
         logConfiguration.configure();
-        
-        EpisodeManager episodeManager = injector.getInstance(EpisodeManager.class);
         
         Scheduler scheduler = injector.getInstance(Scheduler.class);
         
         scheduler.start();
         
-        new ApplicationMainWindow(config, episodeManager);
+        ApplicationMainWindow appMainWindow = injector.getInstance(ApplicationMainWindow.class);
+        appMainWindow.setVisible(true);
         
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            config.save();
-            episodeManager.save();
+            // TODO: throw save events for config and episode list
+            Events.post(new SaveConfigEvent());
+            Events.post(new SaveEpisodeListEvent());
         }));
         
         addCloseListener();
     }
     
+    // TODO: maybe refactor this to a util class
+    // TODO: maybe create similar methods for logging directory
     private static void createAppDataDirectory() {
         try {
             Files.createDirectories(new File(DirectoryUtil.DATA_DIR).toPath());
@@ -64,7 +62,7 @@ public class App {
         // close when escape is pressed
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
             if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                Events.post(new TestEscapePressedEvent("asd"));
+                System.exit(0);
             }
             return false;
         });

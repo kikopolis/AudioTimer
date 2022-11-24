@@ -1,6 +1,6 @@
 package com.kikopolis.episode;
 
-import com.kikopolis.episode.EpisodeManagerWithScheduler.CurrentTimeHolder;
+import com.kikopolis.episode.EpisodeManagerInterfaceWithScheduler.CurrentTimeHolder;
 import com.kikopolis.util.DayOfWeek;
 
 import java.util.List;

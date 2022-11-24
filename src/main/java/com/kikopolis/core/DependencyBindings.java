@@ -7,8 +7,8 @@ import com.kikopolis.config.ConfigWriterAndReaderKeyValue;
 import com.kikopolis.config.Configuration;
 import com.kikopolis.config.logging.LogConfiguration;
 import com.kikopolis.config.logging.Slf4JLogConfiguration;
-import com.kikopolis.episode.EpisodeManager;
-import com.kikopolis.episode.EpisodeManagerWithScheduler;
+import com.kikopolis.episode.EpisodeManagerInterface;
+import com.kikopolis.episode.EpisodeManagerInterfaceWithScheduler;
 import com.kikopolis.episode.EpisodeWriterAndReader;
 import com.kikopolis.episode.EpisodeWriterAndReaderCsv;
 import com.kikopolis.schedule.Scheduler;
@@ -19,9 +19,9 @@ public class DependencyBindings extends AbstractModule {
     protected void configure() {
         bind(Configuration.class).to(AppConfig.class).asEagerSingleton();
         bind(LogConfiguration.class).to(Slf4JLogConfiguration.class).asEagerSingleton();
+        bind(EpisodeManagerInterface.class).to(EpisodeManagerInterfaceWithScheduler.class).asEagerSingleton();
+        bind(Scheduler.class).to(SchedulerByInterval.class).asEagerSingleton();
         bind(ConfigWriterAndReader.class).to(ConfigWriterAndReaderKeyValue.class);
         bind(EpisodeWriterAndReader.class).to(EpisodeWriterAndReaderCsv.class);
-        bind(EpisodeManager.class).to(EpisodeManagerWithScheduler.class);
-        bind(Scheduler.class).to(SchedulerByInterval.class);
     }
 }

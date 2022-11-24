@@ -2,7 +2,7 @@ package com.kikopolis.episode;
 
 import java.util.List;
 
-public interface EpisodeManager {
+public interface EpisodeManagerInterface {
     void addEpisode(final AudioEpisode episode);
     void removeEpisode(final AudioEpisode episode);
     void checkAndDispatchEpisodes();

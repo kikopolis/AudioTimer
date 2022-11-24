@@ -1,6 +1,6 @@
 package com.kikopolis.episode;
 
-import com.kikopolis.episode.EpisodeManagerWithScheduler.CurrentTimeHolder;
+import com.kikopolis.episode.EpisodeManagerInterfaceWithScheduler.CurrentTimeHolder;
 
 import java.time.LocalDate;
 import java.util.List;

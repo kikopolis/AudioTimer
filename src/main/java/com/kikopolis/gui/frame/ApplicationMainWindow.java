@@ -2,44 +2,31 @@ package com.kikopolis.gui.frame;
 
 import com.kikopolis.config.ConfigKey;
 import com.kikopolis.config.Configuration;
-import com.kikopolis.core.Events;
-import com.kikopolis.episode.EpisodeManager;
-import com.kikopolis.event.EventSubscriber;
-import com.kikopolis.event.TestEscapePressedEvent;
+import com.kikopolis.gui.button.RefreshButton;
 import com.kikopolis.gui.panel.EpisodeList;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ApplicationMainWindow extends JFrame implements EventSubscriber {
+public class ApplicationMainWindow extends JFrame {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationMainWindow.class.getName());
     private static final GridBagLayout layout = new GridBagLayout();
     private static final GridBagConstraints gbc = new GridBagConstraints();
     private final transient Configuration config;
-    private final transient EpisodeManager episodeManager;
     
-    public ApplicationMainWindow(final Configuration config, final EpisodeManager episodeManager) {
-        Events.subscribe(this);
-        
+    public ApplicationMainWindow(final Configuration config) {
         this.config = config;
-        this.episodeManager = episodeManager;
         init();
         
+        // Add a button to refresh the event list
+        add(new RefreshButton(), gbc);
+        
+        // TODO: refactor out all components
         EpisodeList episodeList = new EpisodeList();
         add(episodeList, gbc);
-        episodeList.display(episodeManager.getEpisodes());
         episodeList.setVisible(true);
-        
-        setVisible(true);
-    }
-    
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvt(final TestEscapePressedEvent event) {
-        System.exit(0);
     }
     
     private void init() {
