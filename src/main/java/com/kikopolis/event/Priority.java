@@ -1,4 +1,4 @@
-package com.kikopolis.eventbus;
+package com.kikopolis.event;
 
 public class Priority {
     private Priority() {}

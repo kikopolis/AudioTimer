@@ -1,4 +1,4 @@
-package com.kikopolis.event;
+package com.kikopolis.task;
 
 import com.kikopolis.util.DayOfWeek;
 
@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract sealed class AudioEvent implements Serializable permits RecurringAudioEvent, SingularAudioEvent {
+public abstract sealed class AudioTask implements Serializable permits RecurringAudioTask, SingularAudioTask {
     public static final String EMPTY_NAME = "empty_name";
     public static final String EMPTY_SOUND = "empty_sound";
     public static final Integer EMPTY_HOUR = -12;
@@ -19,7 +19,7 @@ public abstract sealed class AudioEvent implements Serializable permits Recurrin
     private Integer minute;
     private boolean isDispatched;
     
-    protected AudioEvent(final String name, final String sound, final Integer hour, final Integer minute, final boolean isDispatched) {
+    protected AudioTask(final String name, final String sound, final Integer hour, final Integer minute, final boolean isDispatched) {
         id = UUID.randomUUID();
         this.name = name != null ? name : EMPTY_NAME;
         this.sound = sound != null ? sound : EMPTY_SOUND;
@@ -28,9 +28,9 @@ public abstract sealed class AudioEvent implements Serializable permits Recurrin
         this.isDispatched = isDispatched;
     }
     
-    public static AudioEvent createFromCsv(final String[] csv) {
+    public static AudioTask createFromCsv(final String[] csv) {
         return switch (csv[0]) {
-            case "RepeatableEvent" -> new RecurringAudioEvent(
+            case TaskType.RECURRING_AUDIO_TASK -> new RecurringAudioTask(
                     csv[1],
                     csv[2],
                     Integer.parseInt(csv[3]),
@@ -38,7 +38,7 @@ public abstract sealed class AudioEvent implements Serializable permits Recurrin
                     DayOfWeek.valueOf(csv[5]),
                     DayOfWeek.valueOf(csv[6])
             );
-            case "SingularEvent" -> new SingularAudioEvent(
+            case TaskType.SINGULAR_AUDIO_TASK -> new SingularAudioTask(
                     csv[1],
                     csv[2],
                     Integer.parseInt(csv[3]),
@@ -46,7 +46,7 @@ public abstract sealed class AudioEvent implements Serializable permits Recurrin
                     Boolean.parseBoolean(csv[5]),
                     LocalDate.parse(csv[6])
             );
-            default -> throw new IllegalArgumentException("Unknown Event type: " + csv[0]);
+            default -> throw new IllegalArgumentException("Unknown Task type: " + csv[0]);
         };
     }
     

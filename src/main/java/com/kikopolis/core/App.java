@@ -3,13 +3,11 @@ package com.kikopolis.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.kikopolis.config.logging.LogConfiguration;
-import com.kikopolis.event.TestEventWriter;
-import com.kikopolis.gui.window.Main;
+import com.kikopolis.gui.FrameManager;
 import com.kikopolis.schedule.Scheduler;
+import com.kikopolis.task.TestTaskWriter;
 import com.kikopolis.util.DirectoryUtil;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,16 +29,13 @@ public class App {
         LogConfiguration logConfiguration = injector.getInstance(LogConfiguration.class);
         logConfiguration.configure();
         
+        new TestTaskWriter();
+        
         Scheduler scheduler = injector.getInstance(Scheduler.class);
         
         scheduler.start();
         
-        Main appMainWindow = injector.getInstance(Main.class);
-        appMainWindow.setVisible(true);
-        
-        new TestEventWriter();
-        
-        addCloseListener();
+        FrameManager.getInstance(injector).getMainFrame().showFrame();
     }
     
     // TODO: maybe refactor this to a util class
@@ -51,16 +46,5 @@ public class App {
         } catch (IOException e) {
             throw new RuntimeException("Can not create app data directory", e);
         }
-    }
-    
-    // TODO: remove this after testing is done
-    private static void addCloseListener() {
-        // close when escape is pressed
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
-            if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                System.exit(0);
-            }
-            return false;
-        });
     }
 }

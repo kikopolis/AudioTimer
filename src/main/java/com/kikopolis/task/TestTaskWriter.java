@@ -1,7 +1,4 @@
-package com.kikopolis.event;
-
-import com.kikopolis.core.Events;
-import com.kikopolis.eventbus.event.SaveEventListBusEvent;
+package com.kikopolis.task;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,21 +11,20 @@ import static com.kikopolis.util.Randomizer.randomMinute;
 import static com.kikopolis.util.Randomizer.randomMonth;
 import static com.kikopolis.util.Randomizer.randomNumber;
 
-public class TestEventWriter {
-    public TestEventWriter() {
-        List<AudioEvent> events = new ArrayList<>();
+public class TestTaskWriter {
+    public TestTaskWriter() {
+        List<AudioTask> events = new ArrayList<>();
         for (int i = 0; i < 29; i++) {
-            events.add(randomSingularEvent());
+            events.add(randomSingularTask());
         }
         for (int i = 0; i < 56; i++) {
-            events.add(randomRecurringEvent());
+            events.add(randomRecurringTask());
         }
-        Events.post(new SaveEventListBusEvent(events));
     }
     
-    private AudioEvent randomRecurringEvent() {
-        return new RecurringAudioEvent(
-                "Test Event %s".formatted(randomNumber(1000)),
+    private AudioTask randomRecurringTask() {
+        return new RecurringAudioTask(
+                "Test Task %s".formatted(randomNumber(1000)),
                 "sound%s.wav".formatted(randomNumber(1000)),
                 randomHour(),
                 randomMinute(),
@@ -37,9 +33,9 @@ public class TestEventWriter {
         );
     }
     
-    private AudioEvent randomSingularEvent() {
-        return new SingularAudioEvent(
-                "Test Event %s".formatted(randomNumber(1000)),
+    private AudioTask randomSingularTask() {
+        return new SingularAudioTask(
+                "Test Task %s".formatted(randomNumber(1000)),
                 "sound%s.wav".formatted(randomNumber(1000)),
                 randomHour(),
                 randomMinute(),
