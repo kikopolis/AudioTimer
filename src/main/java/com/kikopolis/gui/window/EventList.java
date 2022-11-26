@@ -3,6 +3,7 @@ package com.kikopolis.gui.window;
 import com.kikopolis.core.Events;
 import com.kikopolis.eventbus.BusEventSubscriber;
 import com.kikopolis.eventbus.Priority;
+import com.kikopolis.eventbus.event.AddNewEvent;
 import com.kikopolis.eventbus.event.EventListRefreshBusEvent;
 import com.kikopolis.eventbus.window.EventEditOpenedBusEvent;
 import com.kikopolis.eventbus.window.EventListClosedBusEvent;
@@ -14,6 +15,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public class EventList extends JFrame implements BusEventSubscriber {
     public static final int WIDTH = 1024;
@@ -28,6 +30,9 @@ public class EventList extends JFrame implements BusEventSubscriber {
         setTitle("Event List");
         setLayout(layout);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setVisible(true);
+        // add an event edit button somewhere
+        addButtons();
     }
     
     @Subscribe(threadMode = ThreadMode.MAIN, priority = Priority.WINDOW_CONFIGURE)
@@ -38,21 +43,16 @@ public class EventList extends JFrame implements BusEventSubscriber {
         }
         // Then, create a new event list
         list = new List(event.getEvents());
-        
         // Finally, add the new event list to the window and make it visible
         add(list);
         add(new JScrollPane(list));
         list.setVisible(true);
-        setVisible(true);
-        // add an event edit button somewhere
-        addButtons();
     }
     
     // TODO: add a close button for the list
     public void addButtons() {
-        JButton closeButton = new ActionListenerButton("Close", e -> {
-            Events.post(new EventListClosedBusEvent());
-            dispose();
+        JButton addButton = new ActionListenerButton("Add Event", e -> {
+            Events.post(new AddNewEvent());
         });
         JButton editButton = new ActionListenerButton("Edit", e -> {
             if (list.getSelectedValue() != null) {
@@ -61,6 +61,12 @@ public class EventList extends JFrame implements BusEventSubscriber {
                 JOptionPane.showMessageDialog(this, "Please select an event to edit.");
             }
         });
+        JButton closeButton = new ActionListenerButton("Close", e -> {
+            Events.post(new EventListClosedBusEvent());
+            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+            dispose();
+        });
+        add(addButton, gbc);
         add(closeButton, gbc);
         add(editButton, gbc);
         // TODO: when closed, trigger either refresh event or a close event

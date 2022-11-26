@@ -39,6 +39,7 @@ public class EventEdit extends JFrame {
     public void onEventEditWindowOpen(final EventEditOpenedBusEvent busEvent) {
         AudioEvent event = busEvent.getEvent();
         JTextField name = new JTextField(event.getName());
+        // TODO: figure out the event sound
         String[] sounds = new String[]{"sound1.wav", "sound2.wav", "sound3.wav"};
         JComboBox<String> sound = new JComboBox<>(sounds);
         JFormattedTextField hour = new JFormattedTextField(event.getHour());
