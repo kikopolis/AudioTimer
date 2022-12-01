@@ -8,10 +8,13 @@ import com.kikopolis.task.TaskType;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 public class UpcomingTasks extends JPanel implements EventSubscriber {
     private static final Logger LOGGER = Logger.getLogger(UpcomingTasks.class.getName());
+    private static final GridBagLayout layout = new GridBagLayout();
+    private static final GridBagConstraints gbc = new GridBagConstraints();
     
     public UpcomingTasks() {
         setVisible(true);

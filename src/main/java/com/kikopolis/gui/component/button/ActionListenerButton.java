@@ -8,4 +8,9 @@ public class ActionListenerButton extends JButton {
         super(text);
         addActionListener(actionListener);
     }
+    
+    public ActionListenerButton(final Icon icon, final ActionListener actionListener) {
+        super(icon);
+        addActionListener(actionListener);
+    }
 }

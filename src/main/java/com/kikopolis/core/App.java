@@ -1,7 +1,7 @@
 package com.kikopolis.core;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.kikopolis.audio.AudioPlayerController;
 import com.kikopolis.config.logging.LogConfiguration;
 import com.kikopolis.gui.FrameManager;
 import com.kikopolis.schedule.Scheduler;
@@ -22,17 +22,18 @@ public class App {
         // First make sure our data directory exists
         createAppDataDirectory();
         //Create Guice injector and configure dependencies in AppModule
-        Injector injector = Guice.createInjector(new DependencyBindings());
+        var injector = Guice.createInjector(new DependencyBindings());
         // Initialize logging
         // TODO: Maybe configure logging in log4j.properties and throw exception if it fails
         // TODO: maybe also throw when the log file is not writable etc
-        LogConfiguration logConfiguration = injector.getInstance(LogConfiguration.class);
+        var logConfiguration = injector.getInstance(LogConfiguration.class);
         logConfiguration.configure();
         
         new TestTaskWriter();
         
-        Scheduler scheduler = injector.getInstance(Scheduler.class);
+        var audioController = injector.getInstance(AudioPlayerController.class);
         
+        var scheduler = injector.getInstance(Scheduler.class);
         scheduler.start();
         
         FrameManager.getInstance(injector).getMainFrame().showFrame();
